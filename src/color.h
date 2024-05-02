@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace whitted {
+namespace kajiya {
 class color {
 public:
 	float r, g, b, a;
@@ -70,4 +70,4 @@ public:
 color operator*(float scalar, color &color) {
 	return color * scalar;
 }
-} // namespace whitted
+} // namespace kajiya

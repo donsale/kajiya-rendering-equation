@@ -2,7 +2,7 @@
 
 #include "vec3.h"
 
-namespace whitted {
+namespace kajiya {
 class ray {
 public:
 	vec3 origin, direction;
@@ -15,4 +15,4 @@ public:
 		return origin + direction * t;
 	}
 };
-} // namespace whitted
+} // namespace kajiya

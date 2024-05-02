@@ -4,7 +4,8 @@
 #include "vec3.h"
 #include <iostream>
 #include <optional>
-namespace whitted {
+
+namespace kajiya {
 class triangle {
 public:
 	vec3 p1, p2, p3, n;
@@ -84,4 +85,4 @@ public:
 		return col;
 	}
 };
-} // namespace whitted
+} // namespace kajiya

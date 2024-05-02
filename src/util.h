@@ -3,6 +3,8 @@
 #include <array>
 #include <fstream>
 
+#include "vec3.h"
+
 template <unsigned int width, int height>
 void save(std::string filename,
 		  std::array<std::array<unsigned int, width>, height> pixels) {
@@ -23,8 +25,8 @@ float clamp(float low, float high, float value) {
 	return std::max(low, std::min(high, value));
 }
 
-float fresnel(whitted::vec3 I, whitted::vec3 N, float ior1, float ior2) {
-	float cosi = clamp(-1, 1, whitted::vec3::dot(I, N));
+float fresnel(kajiya::vec3 I, kajiya::vec3 N, float ior1, float ior2) {
+	float cosi = clamp(-1, 1, kajiya::vec3::dot(I, N));
 	float etai = ior1, etat = ior2;
 	if (cosi > 0) {
 		std::swap(etai, etat);

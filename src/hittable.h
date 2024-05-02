@@ -5,7 +5,7 @@
 #include "vec3.h"
 #include <optional>
 
-namespace whitted {
+namespace kajiya {
 class hittable {
 public:
 	virtual std::optional<vec3> intersect(ray &r) const = 0;
@@ -14,4 +14,4 @@ public:
 	virtual color get_color(vec3 &point) const			= 0;
 };
 
-} // namespace whitted
+} // namespace kajiya

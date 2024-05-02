@@ -2,7 +2,7 @@
 
 #include <cmath>
 
-namespace whitted {
+namespace kajiya {
 class vec3 {
 public:
 	float x, y, z;
@@ -62,4 +62,4 @@ public:
 		return tangential_component * 2 - *this;
 	}
 };
-} // namespace whitted
+} // namespace kajiya
