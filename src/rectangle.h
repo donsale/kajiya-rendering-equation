@@ -52,14 +52,14 @@ public:
 
 class rectangle : public hittable {
 public:
-	int num_squares_x, num_squares_y;
 	vec3 p1, p2, p3, p4, n;
+	color col;
 	triangle t1, t2;
 	material m;
 
-	rectangle(int x, int y, vec3 p1, vec3 p2, vec3 p3, vec3 p4, vec3 n)
-		: num_squares_x(x), num_squares_y(y), p1(p1), p2(p2), p3(p3), p4(p4),
-		  n(n), t1(triangle(p1, p2, p3, n)), t2(triangle(p2, p3, p4, n)) {
+	rectangle(vec3 p1, vec3 p2, vec3 p3, vec3 p4, vec3 n, color c)
+		: p1(p1), p2(p2), p3(p3), p4(p4), n(n), col(c),
+		  t1(triangle(p1, p2, p3, n)), t2(triangle(p2, p3, p4, n)) {
 	}
 
 	std::optional<vec3> intersect(ray &r) const {
@@ -81,23 +81,7 @@ public:
 	}
 
 	color get_color(vec3 &point) const {
-		vec3 x_axis	 = (p2 - p1);
-		vec3 y_axis	 = (p3 - p1);
-		float width	 = x_axis.norm();
-		float height = y_axis.norm();
-		float x		 = vec3::dot(point - p1, x_axis.unit());
-		float y		 = vec3::dot(point - p1, y_axis.unit());
-
-		float one_square_width	= width / num_squares_x;
-		float one_square_height = height / num_squares_y;
-
-		if ((int)(std::floor(x / one_square_width) +
-				  std::floor(y / one_square_height)) %
-				2 ==
-			0)
-			return color(0.8, 0.227, 0, 0);
-		else
-			return color(0.925, 0.898, 0.196, 0);
+		return col;
 	}
 };
 } // namespace whitted
