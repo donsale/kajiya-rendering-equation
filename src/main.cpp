@@ -1,7 +1,6 @@
 #include <iostream>
 
-int main()
-{
-    std::cout << "kajiya\n";
-    return 0;
+int main() {
+	std::cout << "kajiya neumann series\n";
+	return 0;
 }
