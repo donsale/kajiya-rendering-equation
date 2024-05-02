@@ -1,3 +1,5 @@
+#pragma once
+
 #include "color.h"
 #include "hittable.h"
 #include "ray.h"
@@ -73,7 +75,7 @@ public:
 		return t1_result;
 	}
 
-	Material mat() const {
+	Material material() const {
 		return m;
 	}
 

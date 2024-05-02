@@ -57,28 +57,20 @@ float fresnel(kajiya::Vec3 I, kajiya::Vec3 N, float ior1, float ior2) {
 void load_scene(std::vector<kajiya::Hittable *> &objects) {
 
 	kajiya::Material white;
-	white.brdf.reflectance_spectrum[500] = 0.747;
-	white.brdf.reflectance_spectrum[600] = 0.740;
-	white.brdf.reflectance_spectrum[700] = 0.737;
-	white.type							 = kajiya::Material::diffuse;
+	white.brdf = kajiya::Vec3(0.747, 0.740, 0.737);
+	white.type = kajiya::Material::diffuse;
 
 	kajiya::Material red;
-	red.brdf.reflectance_spectrum[500] = 0.058;
-	red.brdf.reflectance_spectrum[600] = 0.287;
-	red.brdf.reflectance_spectrum[700] = 0.642;
-	red.type						   = kajiya::Material::diffuse;
+	red.brdf = kajiya::Vec3(0.058, 0.287, 0.642);
+	red.type = kajiya::Material::diffuse;
 
 	kajiya::Material green;
-	green.brdf.reflectance_spectrum[500] = 0.285;
-	green.brdf.reflectance_spectrum[600] = 0.160;
-	green.brdf.reflectance_spectrum[700] = 0.159;
-	green.type							 = kajiya::Material::diffuse;
+	green.brdf = kajiya::Vec3(0.285, 0.160, 0.159);
+	green.type = kajiya::Material::diffuse;
 
-	kajiya::Material light;
-	light.brdf.reflectance_spectrum[500] = 8.0;
-	light.brdf.reflectance_spectrum[600] = 15.6;
-	light.brdf.reflectance_spectrum[700] = 18.4;
-	light.type							 = kajiya::Material::light;
+	kajiya::Material material_light;
+	material_light.emittance = kajiya::Vec3(8.0, 15.6, 18.4);
+	material_light.type		 = kajiya::Material::light;
 
 	// floor, white
 	kajiya::Rectangle floor(
@@ -89,7 +81,7 @@ void load_scene(std::vector<kajiya::Hittable *> &objects) {
 	kajiya::Rectangle light(kajiya::Vec3(343.0, 548.8, 227.0),
 							kajiya::Vec3(343.0, 548.8, 332.0),
 							kajiya::Vec3(213.0, 548.8, 332.0),
-							kajiya::Vec3(213.0, 548.8, 227.0), light);
+							kajiya::Vec3(213.0, 548.8, 227.0), material_light);
 
 	// ceiling, white
 	kajiya::Rectangle ceiling(
