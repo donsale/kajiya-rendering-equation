@@ -6,12 +6,11 @@
 #include <optional>
 
 namespace kajiya {
-class hittable {
+class Hittable {
 public:
-	virtual std::optional<vec3> intersect(ray &r) const = 0;
-	virtual vec3 normal(vec3 &intersection_point) const = 0;
-	virtual material mat() const						= 0;
-	virtual color get_color(vec3 &point) const			= 0;
+	virtual std::optional<Vec3> intersect(Ray &r) const = 0;
+	virtual Vec3 normal(Vec3 &intersection_point) const = 0;
+	virtual Material mat() const						= 0;
 	// virtual Brdf get_brdf() const						= 0;
 };
 

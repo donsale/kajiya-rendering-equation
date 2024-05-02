@@ -3,15 +3,15 @@
 #include "vec3.h"
 
 namespace kajiya {
-class ray {
+class Ray {
 public:
-	vec3 origin, direction;
+	Vec3 origin, direction;
 	float refractive_index;
 
-	ray(vec3 o, vec3 d, float index = 1)
+	Ray(Vec3 o, Vec3 d, float index = 1)
 		: origin(o), direction(d), refractive_index(index){};
 
-	vec3 value(float t) const {
+	Vec3 value(float t) const {
 		return origin + direction * t;
 	}
 };

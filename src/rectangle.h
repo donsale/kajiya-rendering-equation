@@ -6,19 +6,19 @@
 #include <optional>
 
 namespace kajiya {
-class triangle {
+class Triangle {
 public:
-	vec3 p1, p2, p3, n;
+	Vec3 p1, p2, p3, n;
 
-	triangle(vec3 p1, vec3 p2, vec3 p3, vec3 n) : p1(p1), p2(p2), p3(p3), n(n) {
+	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n) : p1(p1), p2(p2), p3(p3), n(n) {
 	}
 
-	std::optional<vec3> intersect(ray &r) const {
+	std::optional<Vec3> intersect(Ray &r) const {
 		// G = p1
 		// n = n
 		// A = r.origin
 		// B = r.direction
-		float ray_parallel_with_plane_indicator = vec3::dot(r.direction, n);
+		float ray_parallel_with_plane_indicator = Vec3::dot(r.direction, n);
 
 		// Ray is parallel
 		if (ray_parallel_with_plane_indicator < 0.0005 &&
@@ -28,18 +28,18 @@ public:
 		}
 
 		float t =
-			vec3::dot((p1 - r.origin), n) / ray_parallel_with_plane_indicator;
+			Vec3::dot((p1 - r.origin), n) / ray_parallel_with_plane_indicator;
 
 		if (t > 0) {
-			vec3 intersection_point = r.value(t);
+			Vec3 intersection_point = r.value(t);
 
-			vec3 c1 = vec3::cross(intersection_point - p1, p2 - p1);
-			vec3 c2 = vec3::cross(intersection_point - p2, p3 - p2);
-			vec3 c3 = vec3::cross(intersection_point - p3, p1 - p3);
+			Vec3 c1 = Vec3::cross(intersection_point - p1, p2 - p1);
+			Vec3 c2 = Vec3::cross(intersection_point - p2, p3 - p2);
+			Vec3 c3 = Vec3::cross(intersection_point - p3, p1 - p3);
 
-			float d1 = vec3::dot(c1, n);
-			float d2 = vec3::dot(c2, n);
-			float d3 = vec3::dot(c3, n);
+			float d1 = Vec3::dot(c1, n);
+			float d2 = Vec3::dot(c2, n);
+			float d3 = Vec3::dot(c3, n);
 
 			if ((d1 < 0 && d2 < 0 && d3 < 0) || (d1 > 0 && d2 > 0 && d3 > 0))
 				return intersection_point;
@@ -51,19 +51,19 @@ public:
 	}
 };
 
-class rectangle : public hittable {
+class Rectangle : public Hittable {
 public:
-	vec3 p1, p2, p3, p4, n;
-	color col;
-	triangle t1, t2;
-	material m;
+	Vec3 p1, p2, p3, p4, n;
+	Triangle t1, t2;
+	Material m;
 
-	rectangle(vec3 p1, vec3 p2, vec3 p3, vec3 p4, vec3 n, color c)
-		: p1(p1), p2(p2), p3(p3), p4(p4), n(n), col(c),
-		  t1(triangle(p1, p2, p3, n)), t2(triangle(p2, p3, p4, n)) {
+	Rectangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4, Material m)
+		: p1(p1), p2(p2), p3(p3), p4(p4), m(m),
+		  n(Vec3::cross(p2 - p1, p4 - p1).unit()), t1(Triangle(p1, p2, p3, n)),
+		  t2(Triangle(p2, p3, p4, n)) {
 	}
 
-	std::optional<vec3> intersect(ray &r) const {
+	std::optional<Vec3> intersect(Ray &r) const {
 		auto t1_result = t1.intersect(r);
 
 		if (!t1_result.has_value()) {
@@ -73,16 +73,12 @@ public:
 		return t1_result;
 	}
 
-	material mat() const {
+	Material mat() const {
 		return m;
 	}
 
-	vec3 normal(vec3 &point) const {
+	Vec3 normal(Vec3 &point) const {
 		return n;
-	}
-
-	color get_color(vec3 &point) const {
-		return col;
 	}
 };
 } // namespace kajiya
