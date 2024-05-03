@@ -30,6 +30,31 @@ float clamp(float low, float high, float value) {
 	return std::max(low, std::min(high, value));
 }
 
+kajiya::Color spectrum_to_color(kajiya::Vec3 spectrum) {
+	kajiya::Vec3 cmf_500(0.0049, 0.3230, 0.2720);
+	kajiya::Vec3 cmf_600(1.0622, 0.6310, 0.0008);
+	kajiya::Vec3 cmf_700(0.0114, 0.0041, 0.0);
+
+	float X = spectrum.x * cmf_500.x + spectrum.y * cmf_600.x +
+			  spectrum.z * cmf_700.x;
+	float Y = spectrum.x * cmf_500.y + spectrum.y * cmf_600.y +
+			  spectrum.z * cmf_700.y;
+	float Z = spectrum.x * cmf_500.z + spectrum.y * cmf_600.z +
+			  spectrum.z * cmf_700.z;
+
+	float den = X + Y + Z;
+
+	float x = X / den;
+	float y = Y / den;
+	float z = 1.f - x - y;
+
+	float R = 3.2404542 * x - 1.5371385 * y - 0.4985314 * z;
+	float G = -0.9692660 * x + 1.8760108 * y + 0.0415560 * z;
+	float B = 0.0556434 * x - 0.2040259 * y + 1.0572252 * z;
+
+	return kajiya::Color(R, G, B, 0);
+}
+
 float fresnel(kajiya::Vec3 I, kajiya::Vec3 N, float ior1, float ior2) {
 	float cosi = clamp(-1, 1, kajiya::Vec3::dot(I, N));
 	float etai = ior1, etat = ior2;
