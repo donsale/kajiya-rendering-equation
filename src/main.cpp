@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
+#include <atomic>
 
 kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 							std::vector<kajiya::Hittable *> objects) {
@@ -179,10 +180,14 @@ int main() {
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 
-#pragma omp parallel for collapse(2)
+	int two_percent_progress = width*height / 50.f;
+	std::atomic<int> processed_pixels = {};
+
+	std::cout << "__________________________________________________" << std::endl;
+	
+#pragma omp parallel for collapse(2) shared(processed_pixels)
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
-
 			kajiya::Vec3 normalized_image_plane_pixel(
 				(1 - x / half_width) * camera_width / 2.f + camera_position.x,
 				(1 - y / half_height) * camera_height / 2.f + camera_position.y,
@@ -202,18 +207,19 @@ int main() {
 				spectrum = spectrum + Li(ray, objects, max_depth);
 			}
 			spectrum = spectrum / rays_per_pixel;
-			// if (spectrum.sum() > 0)
-			// 	printf("%f\n", spectrum.sum());
-
+			
 			pixels[y][x] = spectrum_to_color(spectrum).clamp().to_hex();
-			// pixels[y][x] =
-			// 	kajiya::Color(spectrum.x, spectrum.y, spectrum.z, 0).to_hex();
+
+			++processed_pixels;
+			if(processed_pixels % two_percent_progress == 0) {
+				std::cout << "#";
+			}
 		}
 	}
 
 	auto end_time = std::chrono::high_resolution_clock::now();
 	auto render_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cout << "Render Time: " << render_time.count() / 1000.f << "s" << std::endl;
+	std::cout << " Render Time: " << render_time.count() / 1000.f << "s" << std::endl;
 
 	save<width, height>("image.ppm", pixels);
 
