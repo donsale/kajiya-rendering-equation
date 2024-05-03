@@ -67,7 +67,7 @@ public:
 	}
 
 	void print() const {
-		std::printf("(%2.2f, %2.2f, %2.2f)", x, y, z);
+		std::printf("(%2.2f, %2.2f, %2.2f)\n", x, y, z);
 	}
 };
 } // namespace kajiya
