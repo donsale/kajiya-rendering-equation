@@ -37,11 +37,11 @@ kajiya::Vec3 rand_unit_vector_on_hemisphere() {
 	return kajiya::Vec3(rand_float(), rand_float(), rand_float()).unit();
 }
 
-kajiya::Vec3 Lr(kajiya::Hittable *object, kajiya::Ray &r,
-				std::vector<kajiya::Hittable *> objects, int depth);
+kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
+					std::vector<kajiya::Hittable *> objects, int depth);
 
-kajiya::Vec3 Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
-				int depth) {
+kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
+					int depth) {
 	auto closest			= trace_ray(ray, objects);
 	auto intersection_point = closest->intersect(ray);
 
@@ -55,7 +55,7 @@ kajiya::Vec3 Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 
 		kajiya::Ray new_ray = kajiya::Ray(new_origin, -ray.direction);
 
-		kajiya::Vec3 spectrum = closest->material().emittance;
+		kajiya::Spectrum spectrum = closest->material().emittance;
 
 		if (depth > 0)
 			spectrum = spectrum + Lr(closest, new_ray, objects, depth - 1);
@@ -63,125 +63,113 @@ kajiya::Vec3 Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 		return spectrum;
 	}
 
-	return kajiya::Vec3(0, 0, 0);
+	return kajiya::Spectrum();
 }
 
-kajiya::Vec3 Lr(kajiya::Hittable *object, kajiya::Ray &r,
-				std::vector<kajiya::Hittable *> objects, int depth) {
+kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
+					std::vector<kajiya::Hittable *> objects, int depth) {
 	kajiya::Ray new_ray(r.origin, rand_unit_vector_on_hemisphere());
-	return object->material().brdf * Li(new_ray, objects, depth) * 2 * pi *
+	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
+		   pi *
 		   kajiya::Vec3::dot(object->normal(new_ray.origin), new_ray.direction);
 }
+
 int main() {
 	srand(time(0));
 
 	std::vector<kajiya::Hittable *> objects;
 
-	kajiya::Material white;
-	white.brdf = kajiya::Vec3(0.747, 0.740, 0.737);
-	white.type = kajiya::Material::diffuse;
-
-	kajiya::Material red;
-	red.brdf = kajiya::Vec3(0.058, 0.287, 0.642);
-	red.type = kajiya::Material::diffuse;
-
-	kajiya::Material green;
-	green.brdf = kajiya::Vec3(0.285, 0.160, 0.159);
-	green.type = kajiya::Material::diffuse;
-
-	kajiya::Material material_light;
-	material_light.emittance = kajiya::Vec3(8.0, 15.6, 18.4);
-	material_light.brdf		 = kajiya::Vec3(0.78, 0.78, 0.78);
-	material_light.type		 = kajiya::Material::light;
-
 	// floor, white
 	kajiya::Rectangle floor(
 		kajiya::Vec3(552.8, 0.0, 0.0), kajiya::Vec3(0.0, 0.0, 0.0),
-		kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(549.6, 0.0, 559.2), white);
+		kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(549.6, 0.0, 559.2),
+		kajiya::Material::get_white());
 
 	objects.push_back(&floor);
 	// light
-	kajiya::Rectangle light(kajiya::Vec3(343.0, 548.8, 227.0),
-							kajiya::Vec3(343.0, 548.8, 332.0),
-							kajiya::Vec3(213.0, 548.8, 332.0),
-							kajiya::Vec3(213.0, 548.8, 227.0), material_light);
+	kajiya::Rectangle light(
+		kajiya::Vec3(343.0, 548.8, 227.0), kajiya::Vec3(343.0, 548.8, 332.0),
+		kajiya::Vec3(213.0, 548.8, 332.0), kajiya::Vec3(213.0, 548.8, 227.0),
+		kajiya::Material::get_light());
 	objects.push_back(&light);
 	// ceiling, white
 	kajiya::Rectangle ceiling(
 		kajiya::Vec3(556.0, 548.8, 0.0), kajiya::Vec3(556.0, 548.8, 559.2),
-		kajiya::Vec3(0.0, 548.8, 559.2), kajiya::Vec3(0.0, 548.8, 0.0), white);
+		kajiya::Vec3(0.0, 548.8, 559.2), kajiya::Vec3(0.0, 548.8, 0.0),
+		kajiya::Material::get_white());
 	objects.push_back(&ceiling);
 	// back wall, white
-	kajiya::Rectangle back_wall(kajiya::Vec3(549.6, 0.0, 559.2),
-								kajiya::Vec3(0.0, 0.0, 559.2),
-								kajiya::Vec3(0.0, 548.8, 559.2),
-								kajiya::Vec3(556.0, 548.8, 559.2), white);
+	kajiya::Rectangle back_wall(
+		kajiya::Vec3(549.6, 0.0, 559.2), kajiya::Vec3(0.0, 0.0, 559.2),
+		kajiya::Vec3(0.0, 548.8, 559.2), kajiya::Vec3(556.0, 548.8, 559.2),
+		kajiya::Material::get_white());
 	objects.push_back(&back_wall);
 	// right wall, green
 	kajiya::Rectangle right_wall(
 		kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(0.0, 0.0, 0.0),
-		kajiya::Vec3(0.0, 548.8, 0.0), kajiya::Vec3(0.0, 548.8, 559.2), green);
+		kajiya::Vec3(0.0, 548.8, 0.0), kajiya::Vec3(0.0, 548.8, 559.2),
+		kajiya::Material::get_green());
 	objects.push_back(&right_wall);
 	// left wall, red
-	kajiya::Rectangle left_wall(kajiya::Vec3(552.8, 0.0, 0.0),
-								kajiya::Vec3(549.6, 0.0, 559.2),
-								kajiya::Vec3(556.0, 548.8, 559.2),
-								kajiya::Vec3(556.0, 548.8, 0.0), red);
+	kajiya::Rectangle left_wall(
+		kajiya::Vec3(552.8, 0.0, 0.0), kajiya::Vec3(549.6, 0.0, 559.2),
+		kajiya::Vec3(556.0, 548.8, 559.2), kajiya::Vec3(556.0, 548.8, 0.0),
+		kajiya::Material::get_red());
 	objects.push_back(&left_wall);
 	// short block, white
-	kajiya::Rectangle short_block_top(kajiya::Vec3(130.0, 165.0, 65.0),
-									  kajiya::Vec3(82.0, 165.0, 225.0),
-									  kajiya::Vec3(240.0, 165.0, 272.0),
-									  kajiya::Vec3(290.0, 165.0, 114.0), white);
+	kajiya::Rectangle short_block_top(
+		kajiya::Vec3(130.0, 165.0, 65.0), kajiya::Vec3(82.0, 165.0, 225.0),
+		kajiya::Vec3(240.0, 165.0, 272.0), kajiya::Vec3(290.0, 165.0, 114.0),
+		kajiya::Material::get_white());
 	objects.push_back(&short_block_top);
-	kajiya::Rectangle short_block_left(kajiya::Vec3(290.0, 0.0, 114.0),
-									   kajiya::Vec3(290.0, 165.0, 114.0),
-									   kajiya::Vec3(240.0, 165.0, 272.0),
-									   kajiya::Vec3(240.0, 0.0, 272.0), white);
+	kajiya::Rectangle short_block_left(
+		kajiya::Vec3(290.0, 0.0, 114.0), kajiya::Vec3(290.0, 165.0, 114.0),
+		kajiya::Vec3(240.0, 165.0, 272.0), kajiya::Vec3(240.0, 0.0, 272.0),
+		kajiya::Material::get_white());
 	objects.push_back(&short_block_left);
-	kajiya::Rectangle short_block_front(kajiya::Vec3(130.0, 0.0, 65.0),
-										kajiya::Vec3(130.0, 165.0, 65.0),
-										kajiya::Vec3(290.0, 165.0, 114.0),
-										kajiya::Vec3(290.0, 0.0, 114.0), white);
+	kajiya::Rectangle short_block_front(
+		kajiya::Vec3(130.0, 0.0, 65.0), kajiya::Vec3(130.0, 165.0, 65.0),
+		kajiya::Vec3(290.0, 165.0, 114.0), kajiya::Vec3(290.0, 0.0, 114.0),
+		kajiya::Material::get_white());
 
 	objects.push_back(&short_block_front);
-	kajiya::Rectangle short_block_right(kajiya::Vec3(82.0, 0.0, 225.0),
-										kajiya::Vec3(82.0, 165.0, 225.0),
-										kajiya::Vec3(130.0, 165.0, 65.0),
-										kajiya::Vec3(130.0, 0.0, 65.0), white);
+	kajiya::Rectangle short_block_right(
+		kajiya::Vec3(82.0, 0.0, 225.0), kajiya::Vec3(82.0, 165.0, 225.0),
+		kajiya::Vec3(130.0, 165.0, 65.0), kajiya::Vec3(130.0, 0.0, 65.0),
+		kajiya::Material::get_white());
 
 	objects.push_back(&short_block_right);
-	kajiya::Rectangle short_block_back(kajiya::Vec3(240.0, 0.0, 272.0),
-									   kajiya::Vec3(240.0, 165.0, 272.0),
-									   kajiya::Vec3(82.0, 165.0, 225.0),
-									   kajiya::Vec3(82.0, 0.0, 225.0), white);
+	kajiya::Rectangle short_block_back(
+		kajiya::Vec3(240.0, 0.0, 272.0), kajiya::Vec3(240.0, 165.0, 272.0),
+		kajiya::Vec3(82.0, 165.0, 225.0), kajiya::Vec3(82.0, 0.0, 225.0),
+		kajiya::Material::get_white());
 	objects.push_back(&short_block_back);
 
 	// tall block, white
-	kajiya::Rectangle tall_block_top(kajiya::Vec3(423.0, 330.0, 247.0),
-									 kajiya::Vec3(265.0, 330.0, 296.0),
-									 kajiya::Vec3(314.0, 330.0, 456.0),
-									 kajiya::Vec3(472.0, 330.0, 406.0), white);
+	kajiya::Rectangle tall_block_top(
+		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(265.0, 330.0, 296.0),
+		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(472.0, 330.0, 406.0),
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_top);
-	kajiya::Rectangle tall_block_left(kajiya::Vec3(423.0, 0.0, 247.0),
-									  kajiya::Vec3(423.0, 330.0, 247.0),
-									  kajiya::Vec3(472.0, 330.0, 406.0),
-									  kajiya::Vec3(472.0, 0.0, 406.0), white);
+	kajiya::Rectangle tall_block_left(
+		kajiya::Vec3(423.0, 0.0, 247.0), kajiya::Vec3(423.0, 330.0, 247.0),
+		kajiya::Vec3(472.0, 330.0, 406.0), kajiya::Vec3(472.0, 0.0, 406.0),
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_left);
-	kajiya::Rectangle tall_block_back(kajiya::Vec3(472.0, 0.0, 406.0),
-									  kajiya::Vec3(472.0, 330.0, 406.0),
-									  kajiya::Vec3(314.0, 330.0, 456.0),
-									  kajiya::Vec3(314.0, 0.0, 456.0), white);
+	kajiya::Rectangle tall_block_back(
+		kajiya::Vec3(472.0, 0.0, 406.0), kajiya::Vec3(472.0, 330.0, 406.0),
+		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(314.0, 0.0, 456.0),
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_back);
-	kajiya::Rectangle tall_block_right(kajiya::Vec3(314.0, 0.0, 456.0),
-									   kajiya::Vec3(314.0, 330.0, 456.0),
-									   kajiya::Vec3(265.0, 330.0, 296.0),
-									   kajiya::Vec3(265.0, 0.0, 296.0), white);
+	kajiya::Rectangle tall_block_right(
+		kajiya::Vec3(314.0, 0.0, 456.0), kajiya::Vec3(314.0, 330.0, 456.0),
+		kajiya::Vec3(265.0, 330.0, 296.0), kajiya::Vec3(265.0, 0.0, 296.0),
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_right);
-	kajiya::Rectangle tall_block_front(kajiya::Vec3(265.0, 0.0, 296.0),
-									   kajiya::Vec3(265.0, 330.0, 296.0),
-									   kajiya::Vec3(423.0, 330.0, 247.0),
-									   kajiya::Vec3(423.0, 0.0, 247.0), white);
+	kajiya::Rectangle tall_block_front(
+		kajiya::Vec3(265.0, 0.0, 296.0), kajiya::Vec3(265.0, 330.0, 296.0),
+		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(423.0, 0.0, 247.0),
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_front);
 
 	const unsigned width  = 800;
@@ -211,7 +199,7 @@ int main() {
 
 			ray.refractive_index = 1.0f;
 
-			kajiya::Vec3 spectrum(0, 0, 0);
+			kajiya::Spectrum spectrum;
 			for (int i = 0; i < rays_per_pixel; ++i) {
 				// ovdje mozemo varirati ray kasnije (ali svakako ima random
 				// odbijanje)
@@ -220,6 +208,8 @@ int main() {
 			spectrum = spectrum / rays_per_pixel;
 
 			pixels[y][x] = spectrum_to_color(spectrum).to_hex();
+			// pixels[y][x] =
+			// 	kajiya::Color(spectrum.x, spectrum.y, spectrum.z, 0).to_hex();
 		}
 	}
 
