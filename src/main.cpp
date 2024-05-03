@@ -46,7 +46,6 @@ kajiya::Vec3 Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 	auto intersection_point = closest->intersect(ray);
 
 	if (intersection_point.has_value()) {
-		std::cout << "pogodio\n";
 		auto surface_normal = closest->normal(intersection_point.value());
 
 		kajiya::Vec3 new_origin =
@@ -189,9 +188,9 @@ int main() {
 	float half_width	  = width / 2.f;
 	float half_height	  = height / 2.f;
 
-	float camera_focal_length = (0, 0, 0.035);
-	float camera_width		  = 0.025;
-	float camera_height		  = 0.025;
+	kajiya::Vec3 camera_focal_length(0, 0, 0.035);
+	float camera_width	= 0.025;
+	float camera_height = 0.025;
 	kajiya::Vec3 camera_position(278, 273, -800);
 
 	std::array<std::array<unsigned, width>, height> pixels;
