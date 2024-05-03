@@ -1,6 +1,6 @@
 #pragma once
 
-#include <map>
+#include <array>
 
 namespace kajiya {
 class Spectrum {
