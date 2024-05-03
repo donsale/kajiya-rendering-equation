@@ -62,7 +62,7 @@ public:
 	Rectangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4, Material m)
 		: p1(p1), p2(p2), p3(p3), p4(p4), m(m),
 		  n(Vec3::cross(p2 - p1, p4 - p1).unit()), t1(Triangle(p1, p2, p3, n)),
-		  t2(Triangle(p2, p3, p4, n)) {
+		  t2(Triangle(p3, p4, p1, n)) {
 	}
 
 	std::optional<Vec3> intersect(Ray &r) const {
