@@ -284,7 +284,7 @@ public:
 
 		for (int i = 700; i <= 830; i++) {
 			light.emittance.spectrum[i - 360] =
-				lerp(18.4, 18.4, (i - 600.f) / 100.f);
+				lerp(18.4, 18.4, (i - 700.f) / 130.f);
 		}
 
 		// for (int i = 0; i < Spectrum::number_of_frequenices; i++) {

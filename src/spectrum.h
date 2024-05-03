@@ -53,7 +53,7 @@ public:
 
 	float sum() const {
 		float sum = 0;
-		for (int i = 0; i < number_of_frequenices; i++) {
+		for (int i = 400 - 360; i < 700 - 360; i++) {
 			sum += spectrum[i];
 		}
 

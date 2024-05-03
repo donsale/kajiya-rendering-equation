@@ -30,8 +30,8 @@ float rand_float() {
 
 float pi		   = 3.1415926535897932;
 float bias		   = 0.00001;
-int max_depth	   = 0;
-int rays_per_pixel = 1;
+int max_depth	   = 2;
+int rays_per_pixel = 2;
 
 kajiya::Vec3 rand_unit_vector_on_hemisphere() {
 	return kajiya::Vec3(rand_float(), rand_float(), rand_float()).unit();
@@ -172,8 +172,8 @@ int main() {
 		kajiya::Material::get_white());
 	objects.push_back(&tall_block_front);
 
-	const unsigned width  = 800;
-	const unsigned height = 600;
+	const unsigned width  = 400;
+	const unsigned height = 400;
 	float half_width	  = width / 2.f;
 	float half_height	  = height / 2.f;
 
@@ -188,7 +188,7 @@ int main() {
 		for (int x = 0; x < width; ++x) {
 
 			kajiya::Vec3 normalized_image_plane_pixel(
-				(x / half_width - 1) * camera_width / 2.f + camera_position.x,
+				(1 - x / half_width) * camera_width / 2.f + camera_position.x,
 				(1 - y / half_height) * camera_height / 2.f + camera_position.y,
 				camera_position.z);
 
@@ -206,6 +206,8 @@ int main() {
 				spectrum = spectrum + Li(ray, objects, max_depth);
 			}
 			spectrum = spectrum / rays_per_pixel;
+			// if (spectrum.sum() > 0)
+			// 	printf("%f\n", spectrum.sum());
 
 			pixels[y][x] = spectrum_to_color(spectrum).clamp().to_hex();
 			// pixels[y][x] =

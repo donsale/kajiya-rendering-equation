@@ -30,6 +30,29 @@ void save(std::string filename,
 float clamp(float low, float high, float value) {
 	return std::max(low, std::min(high, value));
 }
+#define GAMMA_REC709 0 /* Rec. 709 */
+
+float gamma_correct(float c) {
+	double gamma;
+
+	gamma = GAMMA_REC709;
+
+	if (gamma == GAMMA_REC709) {
+		/* Rec. 709 gamma correction. */
+		float cc = 0.018;
+
+		if (c < cc) {
+			c *= ((1.099 * pow(cc, 0.45)) - 0.099) / cc;
+		} else {
+			c = (1.099 * pow(c, 0.45)) - 0.099;
+		}
+	} else {
+		/* Nonlinear colour = (Linear colour)^(1/gamma) */
+		c = pow(c, 1.0 / gamma);
+	}
+
+	return c;
+}
 
 kajiya::Color norm_rgb(double r, double g, double b) {
 #define Max(a, b) (((a) > (b)) ? (a) : (b))
@@ -609,9 +632,9 @@ kajiya::Color spectrum_to_color(kajiya::Spectrum spectrum) {
 	kajiya::Spectrum normalized = spectrum.normalize();
 	float X = 0, Y = 0, Z = 0;
 	for (int i = 0; i < 471; i++) {
-		X += normalized.spectrum[i] * cmf[i][0];
-		Y += normalized.spectrum[i] * cmf[i][1];
-		Z += normalized.spectrum[i] * cmf[i][2];
+		X += spectrum.spectrum[i] * cmf[i][0];
+		Y += spectrum.spectrum[i] * cmf[i][1];
+		Z += spectrum.spectrum[i] * cmf[i][2];
 	}
 	float sum = X + Y + Z;
 	float x	  = X / sum;
@@ -624,7 +647,10 @@ kajiya::Color spectrum_to_color(kajiya::Spectrum spectrum) {
 
 	// return kajiya::Color(R, G, B, 0);
 
-	return xyz_to_rgb(x, y, z);
+	kajiya::Color c = xyz_to_rgb(x, y, z);
+	kajiya::Color gamma(gamma_correct(c.r), gamma_correct(c.g),
+						gamma_correct(c.b), 0);
+	return gamma;
 }
 
 float fresnel(kajiya::Vec3 I, kajiya::Vec3 N, float ior1, float ior2) {
