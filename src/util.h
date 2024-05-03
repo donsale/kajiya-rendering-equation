@@ -27,6 +27,23 @@ void save(std::string filename,
 	}
 }
 
+// Maybe change with better (more uniform) custom rand generator later.
+float rand_float_minus_one_to_one() {
+	return rand() / static_cast<float>(RAND_MAX) * 2 - 1;
+}
+
+kajiya::Vec3 rand_unit_vector_on_hemisphere(kajiya::Vec3 normal) {
+    kajiya::Vec3 rand_unit_vector(rand_float_minus_one_to_one(), rand_float_minus_one_to_one(), rand_float_minus_one_to_one());
+	rand_unit_vector = rand_unit_vector.unit();
+	float d = kajiya::Vec3::dot(rand_unit_vector, normal);
+	if(d < 0) {
+		kajiya::Vec3 proj_vector = normal * d;
+		rand_unit_vector = rand_unit_vector + proj_vector + proj_vector;
+	}
+
+	return rand_unit_vector;
+}
+
 float clamp(float low, float high, float value) {
 	return std::max(low, std::min(high, value));
 }

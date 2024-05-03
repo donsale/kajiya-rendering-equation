@@ -24,18 +24,10 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 		});
 }
 
-float rand_float() {
-	return rand() / static_cast<float>(RAND_MAX);
-}
-
 float pi		   = 3.1415926535897932;
 float bias		   = 0.00001;
 int max_depth	   = 2;
 int rays_per_pixel = 2;
-
-kajiya::Vec3 rand_unit_vector_on_hemisphere() {
-	return kajiya::Vec3(rand_float(), rand_float(), rand_float()).unit();
-}
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth);
@@ -68,7 +60,7 @@ kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth) {
-	kajiya::Ray new_ray(r.origin, rand_unit_vector_on_hemisphere());
+	kajiya::Ray new_ray(r.origin, rand_unit_vector_on_hemisphere(object->normal(r.origin)));
 	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
 		   pi *
 		   kajiya::Vec3::dot(object->normal(new_ray.origin), new_ray.direction);
@@ -90,7 +82,7 @@ int main() {
 	kajiya::Rectangle light(
 		kajiya::Vec3(343.0, 548.8, 227.0), kajiya::Vec3(343.0, 548.8, 332.0),
 		kajiya::Vec3(213.0, 548.8, 332.0), kajiya::Vec3(213.0, 548.8, 227.0),
-		kajiya::Material::get_light());
+		kajiya::Material::get_flashlight());
 	objects.push_back(&light);
 	// ceiling, white
 	kajiya::Rectangle ceiling(
