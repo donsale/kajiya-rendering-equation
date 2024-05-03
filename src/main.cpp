@@ -201,8 +201,7 @@ int main() {
 
 			kajiya::Vec3 normalized_image_plane_pixel(
 				(x / half_width - 1) * camera_width / 2.f + camera_position.x,
-				(1 - y / half_height) * height / width * camera_height / 2.f +
-					camera_position.y,
+				(1 - y / half_height) * camera_height / 2.f + camera_position.y,
 				camera_position.z);
 
 			kajiya::Vec3 focal_point = camera_position - camera_focal_length;
