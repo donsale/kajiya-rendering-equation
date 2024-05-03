@@ -12,11 +12,11 @@
 
 template <unsigned int width, int height>
 void save(std::string filename,
-		  std::array<std::array<unsigned int, width>, height> pixels) {
+		  std::array<std::array<unsigned int, width>, height> &pixels) {
 	std::ofstream out_ppm;
 	out_ppm.open(filename, std::ios_base::binary);
 	out_ppm << "P6\n" << width << " " << height << "\n255\n";
-
+	
 	for (const auto &innerArray : pixels) {
 		for (int val : innerArray) {
 			out_ppm << static_cast<char>((val >> 24) & 0xFF);
