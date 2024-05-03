@@ -91,6 +91,7 @@ int main() {
 
 	kajiya::Material material_light;
 	material_light.emittance = kajiya::Vec3(8.0, 15.6, 18.4);
+	material_light.brdf		 = kajiya::Vec3(0.78, 0.78, 0.78);
 	material_light.type		 = kajiya::Material::light;
 
 	// floor, white
