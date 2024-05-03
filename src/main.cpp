@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#include <chrono>
 
 kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 							std::vector<kajiya::Hittable *> objects) {
@@ -176,6 +177,9 @@ int main() {
 
 	std::array<std::array<unsigned, width>, height> pixels;
 
+	auto start_time = std::chrono::high_resolution_clock::now();
+
+#pragma omp parallel for collapse(2)
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
 
@@ -206,6 +210,10 @@ int main() {
 			// 	kajiya::Color(spectrum.x, spectrum.y, spectrum.z, 0).to_hex();
 		}
 	}
+
+	auto end_time = std::chrono::high_resolution_clock::now();
+	auto render_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
+	std::cout << "Render Time: " << render_time.count() / 1000.f << "s" << std::endl;
 
 	save<width, height>("image.ppm", pixels);
 
