@@ -65,5 +65,9 @@ public:
 
 		return tangential_component * 2 - *this;
 	}
+
+	void print() const {
+		std::printf("(%2.2f, %2.2f, %2.2f)", x, y, z);
+	}
 };
 } // namespace kajiya

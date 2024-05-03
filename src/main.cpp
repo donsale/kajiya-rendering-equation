@@ -31,7 +31,7 @@ float rand_float() {
 float pi		   = 3.1415926535897932;
 float bias		   = 0.00001;
 int max_depth	   = 0;
-int rays_per_pixel = 2;
+int rays_per_pixel = 1;
 
 kajiya::Vec3 rand_unit_vector_on_hemisphere() {
 	return kajiya::Vec3(rand_float(), rand_float(), rand_float()).unit();
@@ -46,6 +46,7 @@ kajiya::Vec3 Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 	auto intersection_point = closest->intersect(ray);
 
 	if (intersection_point.has_value()) {
+		std::cout << "pogodio\n";
 		auto surface_normal = closest->normal(intersection_point.value());
 
 		kajiya::Vec3 new_origin =
