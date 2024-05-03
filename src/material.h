@@ -14,28 +14,82 @@ public:
 		Material white;
 		white.type = Material::white;
 
-		std::map<Spectrum::Frequency, Spectrum::Intensity> reflectance{
-			{400, 0.343}, {404, 0.445}, {408, 0.551}, {412, 0.624},
-			{416, 0.665}, {420, 0.687}, {424, 0.708}, {428, 0.723},
-			{432, 0.715}, {436, 0.710}, {440, 0.745}, {444, 0.758},
-			{448, 0.739}, {452, 0.767}, {456, 0.777}, {460, 0.765},
-			{464, 0.751}, {468, 0.745}, {472, 0.748}, {476, 0.729},
-			{480, 0.745}, {484, 0.757}, {488, 0.753}, {492, 0.750},
-			{496, 0.746}, {500, 0.747}, {504, 0.735}, {508, 0.732},
-			{512, 0.739}, {516, 0.734}, {520, 0.725}, {524, 0.721},
-			{528, 0.733}, {532, 0.725}, {536, 0.732}, {540, 0.743},
-			{544, 0.744}, {548, 0.748}, {552, 0.728}, {556, 0.716},
-			{560, 0.733}, {564, 0.726}, {568, 0.713}, {572, 0.740},
-			{576, 0.754}, {580, 0.764}, {584, 0.752}, {588, 0.736},
-			{592, 0.734}, {596, 0.741}, {600, 0.740}, {604, 0.732},
-			{608, 0.745}, {612, 0.755}, {616, 0.751}, {620, 0.744},
-			{624, 0.731}, {628, 0.733}, {632, 0.744}, {636, 0.731},
-			{640, 0.712}, {644, 0.708}, {648, 0.729}, {652, 0.730},
-			{656, 0.727}, {660, 0.707}, {664, 0.703}, {668, 0.729},
-			{672, 0.750}, {676, 0.760}, {680, 0.751}, {684, 0.739},
-			{688, 0.724}, {692, 0.730}, {696, 0.740}, {700, 0.737},
-		};
-		white.reflectance.spectrum = reflectance;
+		white.reflectance.spectrum[400 - 360] = 0.343;
+		white.reflectance.spectrum[404 - 360] = 0.445;
+		white.reflectance.spectrum[408 - 360] = 0.551;
+		white.reflectance.spectrum[412 - 360] = 0.624;
+		white.reflectance.spectrum[416 - 360] = 0.665;
+		white.reflectance.spectrum[420 - 360] = 0.687;
+		white.reflectance.spectrum[424 - 360] = 0.708;
+		white.reflectance.spectrum[428 - 360] = 0.723;
+		white.reflectance.spectrum[432 - 360] = 0.715;
+		white.reflectance.spectrum[436 - 360] = 0.710;
+		white.reflectance.spectrum[440 - 360] = 0.745;
+		white.reflectance.spectrum[444 - 360] = 0.758;
+		white.reflectance.spectrum[448 - 360] = 0.739;
+		white.reflectance.spectrum[452 - 360] = 0.767;
+		white.reflectance.spectrum[456 - 360] = 0.777;
+		white.reflectance.spectrum[460 - 360] = 0.765;
+		white.reflectance.spectrum[464 - 360] = 0.751;
+		white.reflectance.spectrum[468 - 360] = 0.745;
+		white.reflectance.spectrum[472 - 360] = 0.748;
+		white.reflectance.spectrum[476 - 360] = 0.729;
+		white.reflectance.spectrum[480 - 360] = 0.745;
+		white.reflectance.spectrum[484 - 360] = 0.757;
+		white.reflectance.spectrum[488 - 360] = 0.753;
+		white.reflectance.spectrum[492 - 360] = 0.750;
+		white.reflectance.spectrum[496 - 360] = 0.746;
+		white.reflectance.spectrum[500 - 360] = 0.747;
+		white.reflectance.spectrum[504 - 360] = 0.735;
+		white.reflectance.spectrum[508 - 360] = 0.732;
+		white.reflectance.spectrum[512 - 360] = 0.739;
+		white.reflectance.spectrum[516 - 360] = 0.734;
+		white.reflectance.spectrum[520 - 360] = 0.725;
+		white.reflectance.spectrum[524 - 360] = 0.721;
+		white.reflectance.spectrum[528 - 360] = 0.733;
+		white.reflectance.spectrum[532 - 360] = 0.725;
+		white.reflectance.spectrum[536 - 360] = 0.732;
+		white.reflectance.spectrum[540 - 360] = 0.743;
+		white.reflectance.spectrum[544 - 360] = 0.744;
+		white.reflectance.spectrum[548 - 360] = 0.748;
+		white.reflectance.spectrum[552 - 360] = 0.728;
+		white.reflectance.spectrum[556 - 360] = 0.716;
+		white.reflectance.spectrum[560 - 360] = 0.733;
+		white.reflectance.spectrum[564 - 360] = 0.726;
+		white.reflectance.spectrum[568 - 360] = 0.713;
+		white.reflectance.spectrum[572 - 360] = 0.740;
+		white.reflectance.spectrum[576 - 360] = 0.754;
+		white.reflectance.spectrum[580 - 360] = 0.764;
+		white.reflectance.spectrum[584 - 360] = 0.752;
+		white.reflectance.spectrum[588 - 360] = 0.736;
+		white.reflectance.spectrum[592 - 360] = 0.734;
+		white.reflectance.spectrum[596 - 360] = 0.741;
+		white.reflectance.spectrum[600 - 360] = 0.740;
+		white.reflectance.spectrum[604 - 360] = 0.732;
+		white.reflectance.spectrum[608 - 360] = 0.745;
+		white.reflectance.spectrum[612 - 360] = 0.755;
+		white.reflectance.spectrum[616 - 360] = 0.751;
+		white.reflectance.spectrum[620 - 360] = 0.744;
+		white.reflectance.spectrum[624 - 360] = 0.731;
+		white.reflectance.spectrum[628 - 360] = 0.733;
+		white.reflectance.spectrum[632 - 360] = 0.744;
+		white.reflectance.spectrum[636 - 360] = 0.731;
+		white.reflectance.spectrum[640 - 360] = 0.712;
+		white.reflectance.spectrum[644 - 360] = 0.708;
+		white.reflectance.spectrum[648 - 360] = 0.729;
+		white.reflectance.spectrum[652 - 360] = 0.730;
+		white.reflectance.spectrum[656 - 360] = 0.727;
+		white.reflectance.spectrum[660 - 360] = 0.707;
+		white.reflectance.spectrum[664 - 360] = 0.703;
+		white.reflectance.spectrum[668 - 360] = 0.729;
+		white.reflectance.spectrum[672 - 360] = 0.750;
+		white.reflectance.spectrum[676 - 360] = 0.760;
+		white.reflectance.spectrum[680 - 360] = 0.751;
+		white.reflectance.spectrum[684 - 360] = 0.739;
+		white.reflectance.spectrum[688 - 360] = 0.724;
+		white.reflectance.spectrum[692 - 360] = 0.730;
+		white.reflectance.spectrum[696 - 360] = 0.740;
+		white.reflectance.spectrum[700 - 360] = 0.737;
 
 		return white;
 	}
@@ -44,29 +98,82 @@ public:
 		Material red;
 		red.type = Material::red;
 
-		std::map<Spectrum::Frequency, Spectrum::Intensity> reflectance{
-			{400, 0.040}, {404, 0.046}, {408, 0.048}, {412, 0.053},
-			{416, 0.049}, {420, 0.050}, {424, 0.053}, {428, 0.055},
-			{432, 0.057}, {436, 0.056}, {440, 0.059}, {444, 0.057},
-			{448, 0.061}, {452, 0.061}, {456, 0.060}, {460, 0.062},
-			{464, 0.062}, {468, 0.062}, {472, 0.061}, {476, 0.062},
-			{480, 0.060}, {484, 0.059}, {488, 0.057}, {492, 0.058},
-			{496, 0.058}, {500, 0.058}, {504, 0.056}, {508, 0.055},
-			{512, 0.056}, {516, 0.059}, {520, 0.057}, {524, 0.055},
-			{528, 0.059}, {532, 0.059}, {536, 0.058}, {540, 0.059},
-			{544, 0.061}, {548, 0.061}, {552, 0.063}, {556, 0.063},
-			{560, 0.067}, {564, 0.068}, {568, 0.072}, {572, 0.080},
-			{576, 0.090}, {580, 0.099}, {584, 0.124}, {588, 0.154},
-			{592, 0.192}, {596, 0.255}, {600, 0.287}, {604, 0.349},
-			{608, 0.402}, {612, 0.443}, {616, 0.487}, {620, 0.513},
-			{624, 0.558}, {628, 0.584}, {632, 0.620}, {636, 0.606},
-			{640, 0.609}, {644, 0.651}, {648, 0.612}, {652, 0.610},
-			{656, 0.650}, {660, 0.638}, {664, 0.627}, {668, 0.620},
-			{672, 0.630}, {676, 0.628}, {680, 0.642}, {684, 0.639},
-			{688, 0.657}, {692, 0.639}, {696, 0.635}, {700, 0.642},
-		};
-
-		red.reflectance.spectrum = reflectance;
+		red.reflectance.spectrum[400 - 360] = 0.040;
+		red.reflectance.spectrum[404 - 360] = 0.046;
+		red.reflectance.spectrum[408 - 360] = 0.048;
+		red.reflectance.spectrum[412 - 360] = 0.053;
+		red.reflectance.spectrum[416 - 360] = 0.049;
+		red.reflectance.spectrum[420 - 360] = 0.050;
+		red.reflectance.spectrum[424 - 360] = 0.053;
+		red.reflectance.spectrum[428 - 360] = 0.055;
+		red.reflectance.spectrum[432 - 360] = 0.057;
+		red.reflectance.spectrum[436 - 360] = 0.056;
+		red.reflectance.spectrum[440 - 360] = 0.059;
+		red.reflectance.spectrum[444 - 360] = 0.057;
+		red.reflectance.spectrum[448 - 360] = 0.061;
+		red.reflectance.spectrum[452 - 360] = 0.061;
+		red.reflectance.spectrum[456 - 360] = 0.060;
+		red.reflectance.spectrum[460 - 360] = 0.062;
+		red.reflectance.spectrum[464 - 360] = 0.062;
+		red.reflectance.spectrum[468 - 360] = 0.062;
+		red.reflectance.spectrum[472 - 360] = 0.061;
+		red.reflectance.spectrum[476 - 360] = 0.062;
+		red.reflectance.spectrum[480 - 360] = 0.060;
+		red.reflectance.spectrum[484 - 360] = 0.059;
+		red.reflectance.spectrum[488 - 360] = 0.057;
+		red.reflectance.spectrum[492 - 360] = 0.058;
+		red.reflectance.spectrum[496 - 360] = 0.058;
+		red.reflectance.spectrum[500 - 360] = 0.058;
+		red.reflectance.spectrum[504 - 360] = 0.056;
+		red.reflectance.spectrum[508 - 360] = 0.055;
+		red.reflectance.spectrum[512 - 360] = 0.056;
+		red.reflectance.spectrum[516 - 360] = 0.059;
+		red.reflectance.spectrum[520 - 360] = 0.057;
+		red.reflectance.spectrum[524 - 360] = 0.055;
+		red.reflectance.spectrum[528 - 360] = 0.059;
+		red.reflectance.spectrum[532 - 360] = 0.059;
+		red.reflectance.spectrum[536 - 360] = 0.058;
+		red.reflectance.spectrum[540 - 360] = 0.059;
+		red.reflectance.spectrum[544 - 360] = 0.061;
+		red.reflectance.spectrum[548 - 360] = 0.061;
+		red.reflectance.spectrum[552 - 360] = 0.063;
+		red.reflectance.spectrum[556 - 360] = 0.063;
+		red.reflectance.spectrum[560 - 360] = 0.067;
+		red.reflectance.spectrum[564 - 360] = 0.068;
+		red.reflectance.spectrum[568 - 360] = 0.072;
+		red.reflectance.spectrum[572 - 360] = 0.080;
+		red.reflectance.spectrum[576 - 360] = 0.090;
+		red.reflectance.spectrum[580 - 360] = 0.099;
+		red.reflectance.spectrum[584 - 360] = 0.124;
+		red.reflectance.spectrum[588 - 360] = 0.154;
+		red.reflectance.spectrum[592 - 360] = 0.192;
+		red.reflectance.spectrum[596 - 360] = 0.255;
+		red.reflectance.spectrum[600 - 360] = 0.287;
+		red.reflectance.spectrum[604 - 360] = 0.349;
+		red.reflectance.spectrum[608 - 360] = 0.402;
+		red.reflectance.spectrum[612 - 360] = 0.443;
+		red.reflectance.spectrum[616 - 360] = 0.487;
+		red.reflectance.spectrum[620 - 360] = 0.513;
+		red.reflectance.spectrum[624 - 360] = 0.558;
+		red.reflectance.spectrum[628 - 360] = 0.584;
+		red.reflectance.spectrum[632 - 360] = 0.620;
+		red.reflectance.spectrum[636 - 360] = 0.606;
+		red.reflectance.spectrum[640 - 360] = 0.609;
+		red.reflectance.spectrum[644 - 360] = 0.651;
+		red.reflectance.spectrum[648 - 360] = 0.612;
+		red.reflectance.spectrum[652 - 360] = 0.610;
+		red.reflectance.spectrum[656 - 360] = 0.650;
+		red.reflectance.spectrum[660 - 360] = 0.638;
+		red.reflectance.spectrum[664 - 360] = 0.627;
+		red.reflectance.spectrum[668 - 360] = 0.620;
+		red.reflectance.spectrum[672 - 360] = 0.630;
+		red.reflectance.spectrum[676 - 360] = 0.628;
+		red.reflectance.spectrum[680 - 360] = 0.642;
+		red.reflectance.spectrum[684 - 360] = 0.639;
+		red.reflectance.spectrum[688 - 360] = 0.657;
+		red.reflectance.spectrum[692 - 360] = 0.639;
+		red.reflectance.spectrum[696 - 360] = 0.635;
+		red.reflectance.spectrum[700 - 360] = 0.642;
 		return red;
 	}
 
@@ -74,29 +181,82 @@ public:
 		Material green;
 		green.type = Material::green;
 
-		std::map<Spectrum::Frequency, Spectrum::Intensity> reflectance{
-			{400, 0.092}, {404, 0.096}, {408, 0.098}, {412, 0.097},
-			{416, 0.098}, {420, 0.095}, {424, 0.095}, {428, 0.097},
-			{432, 0.095}, {436, 0.094}, {440, 0.097}, {444, 0.098},
-			{448, 0.096}, {452, 0.101}, {456, 0.103}, {460, 0.104},
-			{464, 0.107}, {468, 0.109}, {472, 0.112}, {476, 0.115},
-			{480, 0.125}, {484, 0.140}, {488, 0.160}, {492, 0.187},
-			{496, 0.229}, {500, 0.285}, {504, 0.343}, {508, 0.390},
-			{512, 0.435}, {516, 0.464}, {520, 0.472}, {524, 0.476},
-			{528, 0.481}, {532, 0.462}, {536, 0.447}, {540, 0.441},
-			{544, 0.426}, {548, 0.406}, {552, 0.373}, {556, 0.347},
-			{560, 0.337}, {564, 0.314}, {568, 0.285}, {572, 0.277},
-			{576, 0.266}, {580, 0.250}, {584, 0.230}, {588, 0.207},
-			{592, 0.186}, {596, 0.171}, {600, 0.160}, {604, 0.148},
-			{608, 0.141}, {612, 0.136}, {616, 0.130}, {620, 0.126},
-			{624, 0.123}, {628, 0.121}, {632, 0.122}, {636, 0.119},
-			{640, 0.114}, {644, 0.115}, {648, 0.117}, {652, 0.117},
-			{656, 0.118}, {660, 0.120}, {664, 0.122}, {668, 0.128},
-			{672, 0.132}, {676, 0.139}, {680, 0.144}, {684, 0.146},
-			{688, 0.150}, {692, 0.152}, {696, 0.157}, {700, 0.159},
-		};
-
-		green.reflectance.spectrum = reflectance;
+		green.reflectance.spectrum[400 - 360] = 0.092;
+		green.reflectance.spectrum[404 - 360] = 0.096;
+		green.reflectance.spectrum[408 - 360] = 0.098;
+		green.reflectance.spectrum[412 - 360] = 0.097;
+		green.reflectance.spectrum[416 - 360] = 0.098;
+		green.reflectance.spectrum[420 - 360] = 0.095;
+		green.reflectance.spectrum[424 - 360] = 0.095;
+		green.reflectance.spectrum[428 - 360] = 0.097;
+		green.reflectance.spectrum[432 - 360] = 0.095;
+		green.reflectance.spectrum[436 - 360] = 0.094;
+		green.reflectance.spectrum[440 - 360] = 0.097;
+		green.reflectance.spectrum[444 - 360] = 0.098;
+		green.reflectance.spectrum[448 - 360] = 0.096;
+		green.reflectance.spectrum[452 - 360] = 0.101;
+		green.reflectance.spectrum[456 - 360] = 0.103;
+		green.reflectance.spectrum[460 - 360] = 0.104;
+		green.reflectance.spectrum[464 - 360] = 0.107;
+		green.reflectance.spectrum[468 - 360] = 0.109;
+		green.reflectance.spectrum[472 - 360] = 0.112;
+		green.reflectance.spectrum[476 - 360] = 0.115;
+		green.reflectance.spectrum[480 - 360] = 0.125;
+		green.reflectance.spectrum[484 - 360] = 0.140;
+		green.reflectance.spectrum[488 - 360] = 0.160;
+		green.reflectance.spectrum[492 - 360] = 0.187;
+		green.reflectance.spectrum[496 - 360] = 0.229;
+		green.reflectance.spectrum[500 - 360] = 0.285;
+		green.reflectance.spectrum[504 - 360] = 0.343;
+		green.reflectance.spectrum[508 - 360] = 0.390;
+		green.reflectance.spectrum[512 - 360] = 0.435;
+		green.reflectance.spectrum[516 - 360] = 0.464;
+		green.reflectance.spectrum[520 - 360] = 0.472;
+		green.reflectance.spectrum[524 - 360] = 0.476;
+		green.reflectance.spectrum[528 - 360] = 0.481;
+		green.reflectance.spectrum[532 - 360] = 0.462;
+		green.reflectance.spectrum[536 - 360] = 0.447;
+		green.reflectance.spectrum[540 - 360] = 0.441;
+		green.reflectance.spectrum[544 - 360] = 0.426;
+		green.reflectance.spectrum[548 - 360] = 0.406;
+		green.reflectance.spectrum[552 - 360] = 0.373;
+		green.reflectance.spectrum[556 - 360] = 0.347;
+		green.reflectance.spectrum[560 - 360] = 0.337;
+		green.reflectance.spectrum[564 - 360] = 0.314;
+		green.reflectance.spectrum[568 - 360] = 0.285;
+		green.reflectance.spectrum[572 - 360] = 0.277;
+		green.reflectance.spectrum[576 - 360] = 0.266;
+		green.reflectance.spectrum[580 - 360] = 0.250;
+		green.reflectance.spectrum[584 - 360] = 0.230;
+		green.reflectance.spectrum[588 - 360] = 0.207;
+		green.reflectance.spectrum[592 - 360] = 0.186;
+		green.reflectance.spectrum[596 - 360] = 0.171;
+		green.reflectance.spectrum[600 - 360] = 0.160;
+		green.reflectance.spectrum[604 - 360] = 0.148;
+		green.reflectance.spectrum[608 - 360] = 0.141;
+		green.reflectance.spectrum[612 - 360] = 0.136;
+		green.reflectance.spectrum[616 - 360] = 0.130;
+		green.reflectance.spectrum[620 - 360] = 0.126;
+		green.reflectance.spectrum[624 - 360] = 0.123;
+		green.reflectance.spectrum[628 - 360] = 0.121;
+		green.reflectance.spectrum[632 - 360] = 0.122;
+		green.reflectance.spectrum[636 - 360] = 0.119;
+		green.reflectance.spectrum[640 - 360] = 0.114;
+		green.reflectance.spectrum[644 - 360] = 0.115;
+		green.reflectance.spectrum[648 - 360] = 0.117;
+		green.reflectance.spectrum[652 - 360] = 0.117;
+		green.reflectance.spectrum[656 - 360] = 0.118;
+		green.reflectance.spectrum[660 - 360] = 0.120;
+		green.reflectance.spectrum[664 - 360] = 0.122;
+		green.reflectance.spectrum[668 - 360] = 0.128;
+		green.reflectance.spectrum[672 - 360] = 0.132;
+		green.reflectance.spectrum[676 - 360] = 0.139;
+		green.reflectance.spectrum[680 - 360] = 0.144;
+		green.reflectance.spectrum[684 - 360] = 0.146;
+		green.reflectance.spectrum[688 - 360] = 0.150;
+		green.reflectance.spectrum[692 - 360] = 0.152;
+		green.reflectance.spectrum[696 - 360] = 0.157;
+		green.reflectance.spectrum[700 - 360] = 0.159;
 		return green;
 	}
 
@@ -107,23 +267,30 @@ public:
 		// Linear interpolation lambda function
 		auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
 
-		std::map<Spectrum::Frequency, Spectrum::Intensity> emittance{};
-
-		for (Spectrum::Frequency f = 400; f <= 500; f++) {
-			emittance[f] = lerp(0, 8.0, (f - 400.f) / (100.f));
+		for (int i = 400; i <= 500; i++) {
+			light.emittance.spectrum[i - 360] =
+				lerp(0, 8.0, (i - 400.f) / (100.f));
 		}
 
-		for (Spectrum::Frequency f = 500; f <= 600; f++) {
-			emittance[f] = lerp(8.0, 15.6, (f - 500.f) / 100.f);
+		for (int i = 500; i <= 600; i++) {
+			light.emittance.spectrum[i - 360] =
+				lerp(8.0, 15.6, (i - 500.f) / 100.f);
 		}
 
-		for (Spectrum::Frequency f = 600; f <= 700; f++) {
-			emittance[f] = lerp(15.6, 18.4, (f - 600.f) / 100.f);
+		for (int i = 600; i <= 700; i++) {
+			light.emittance.spectrum[i - 360] =
+				lerp(15.6, 18.4, (i - 600.f) / 100.f);
 		}
 
-		// mozda dodati jos do 830
+		for (int i = 700; i <= 830; i++) {
+			light.emittance.spectrum[i - 360] =
+				lerp(18.4, 18.4, (i - 600.f) / 100.f);
+		}
 
-		light.emittance.spectrum = emittance;
+		// for (int i = 0; i < Spectrum::number_of_frequenices; i++) {
+		// 	printf("%2.6f\n", light.emittance.spectrum[i]);
+		// }
+
 		return light;
 	}
 };

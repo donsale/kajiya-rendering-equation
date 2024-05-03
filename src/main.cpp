@@ -207,7 +207,7 @@ int main() {
 			}
 			spectrum = spectrum / rays_per_pixel;
 
-			pixels[y][x] = spectrum_to_color(spectrum).to_hex();
+			pixels[y][x] = spectrum_to_color(spectrum).clamp().to_hex();
 			// pixels[y][x] =
 			// 	kajiya::Color(spectrum.x, spectrum.y, spectrum.z, 0).to_hex();
 		}

@@ -5,26 +5,17 @@
 namespace kajiya {
 class Spectrum {
 public:
-	using Frequency = int;
-	using Intensity = float;
-	std::map<Frequency, Intensity> spectrum;
+	static const int number_of_frequenices			  = 471;
+	std::array<float, number_of_frequenices> spectrum = {0};
 
 	Spectrum() {
-		// for (Frequency f = 360; f <= 830; f++) {
-		// 	spectrum[f] = 0;
-		// }
 	}
 
 	Spectrum operator*(const Spectrum &other) const {
 		Spectrum result;
 
-		for (Frequency f = 360; f <= 830; f++) {
-			auto it1 = spectrum.find(f);
-			auto it2 = other.spectrum.find(f);
-
-			if (it1 != spectrum.end() && it2 != other.spectrum.end()) {
-				result.spectrum[f] = it1->second * it2->second;
-			}
+		for (int i = 0; i < number_of_frequenices; i++) {
+			result.spectrum[i] = spectrum[i] * other.spectrum[i];
 		}
 
 		return result;
@@ -33,13 +24,8 @@ public:
 	Spectrum operator+(const Spectrum &other) const {
 		Spectrum result;
 
-		for (Frequency f = 360; f <= 830; f++) {
-			auto it1 = spectrum.find(f);
-			auto it2 = other.spectrum.find(f);
-
-			if (it1 != spectrum.end() && it2 != other.spectrum.end()) {
-				result.spectrum[f] = it1->second + it2->second;
-			}
+		for (int i = 0; i < number_of_frequenices; i++) {
+			result.spectrum[i] = spectrum[i] + other.spectrum[i];
 		}
 
 		return result;
@@ -48,12 +34,8 @@ public:
 	Spectrum operator*(float value) const {
 		Spectrum result;
 
-		for (Frequency f = 360; f <= 830; f++) {
-			auto it1 = spectrum.find(f);
-
-			if (it1 != spectrum.end()) {
-				result.spectrum[f] = it1->second * value;
-			}
+		for (int i = 0; i < number_of_frequenices; i++) {
+			result.spectrum[i] = spectrum[i] * value;
 		}
 
 		return result;
@@ -62,12 +44,8 @@ public:
 	Spectrum operator/(float value) const {
 		Spectrum result;
 
-		for (Frequency f = 360; f <= 830; f++) {
-			auto it1 = spectrum.find(f);
-
-			if (it1 != spectrum.end()) {
-				result.spectrum[f] = it1->second / value;
-			}
+		for (int i = 0; i < number_of_frequenices; i++) {
+			result.spectrum[i] = spectrum[i] / value;
 		}
 
 		return result;
@@ -75,15 +53,22 @@ public:
 
 	float sum() const {
 		float sum = 0;
-		for (Frequency f = 360; f <= 830; f++) {
-			auto it1 = spectrum.find(f);
-
-			if (it1 != spectrum.end()) {
-				sum += it1->second;
-			}
+		for (int i = 0; i < number_of_frequenices; i++) {
+			sum += spectrum[i];
 		}
 
 		return sum;
+	}
+
+	Spectrum normalize() {
+		Spectrum result;
+		float s = sum();
+
+		for (int i = 0; i < number_of_frequenices; i++) {
+			result.spectrum[i] = spectrum[i] / s;
+		}
+
+		return result;
 	}
 };
 
