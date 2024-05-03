@@ -293,5 +293,49 @@ public:
 
 		return light;
 	}
+
+	static Material get_flashlight() {
+		Material light;
+		light.type = Material::light;
+
+		// Linear interpolation lambda function
+		auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
+
+		light.emittance.spectrum[360 - 360] = 6;
+		light.emittance.spectrum[408 - 360] = 4;
+		light.emittance.spectrum[470 - 360] = 100;
+		light.emittance.spectrum[500 - 360] = 83;
+		light.emittance.spectrum[700 - 360] = 65;
+
+		for(int i = 360; i <= 408; i++) {
+			light.emittance.spectrum[i - 360] =
+				lerp(6, 4, (i - 360.f) / (48.f));
+		}
+
+		for(int i = 408; i <= 460; i++) {
+			light.emittance.spectrum[i - 360] =
+				lerp(4, 100, (i - 408.f) / (52.f));
+		}
+		
+		for (int i = 470; i <= 500; i++) {
+			light.emittance.spectrum[i - 360] =
+				lerp(100, 83, (i - 470.f) / 30.f);
+		}
+		
+		for (int i = 500; i <= 700; i++) {
+			light.emittance.spectrum[i - 360] =
+				lerp(83, 65, (i - 500.f) / 200.f);
+		}
+
+		// speculation beyond 700
+		//for (int i = 700; i <= 830; i++) {
+		//	light.emittance.spectrum[i - 360] =
+		//		lerp(65, 60, (i - 700.f) / 130.f);
+		//}
+		
+		light.emittance.normalize();
+
+		return light;
+	}
 };
 } // namespace kajiya
