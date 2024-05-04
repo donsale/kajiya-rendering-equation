@@ -12,18 +12,15 @@
 #include <vector>
 
 template <unsigned int width, int height>
-void save(std::string filename,
-		  std::array<std::array<unsigned int, width>, height> &pixels) {
+void save(std::string filename, std::vector<unsigned> &pixels) {
 	std::ofstream out_ppm;
 	out_ppm.open(filename, std::ios_base::binary);
 	out_ppm << "P6\n" << width << " " << height << "\n255\n";
 
-	for (const auto &innerArray : pixels) {
-		for (int val : innerArray) {
-			out_ppm << static_cast<char>((val >> 24) & 0xFF);
-			out_ppm << static_cast<char>((val >> 16) & 0xFF);
-			out_ppm << static_cast<char>((val >> 8) & 0xFF);
-		}
+	for (int val : pixels) {
+		out_ppm << static_cast<char>((val >> 24) & 0xFF);
+		out_ppm << static_cast<char>((val >> 16) & 0xFF);
+		out_ppm << static_cast<char>((val >> 8) & 0xFF);
 	}
 }
 

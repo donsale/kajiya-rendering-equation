@@ -29,7 +29,7 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 float pi		   = 3.1415926535897932;
 float bias		   = 0.0001;
 int max_depth	   = 1;
-int rays_per_pixel = 1;
+int rays_per_pixel = 3;
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth);
@@ -113,7 +113,8 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 	kajiya::Ray new_ray(r.origin, new_direction);
 	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
 		   pi *
-		   kajiya::Vec3::dot(object->normal(new_ray.origin), new_ray.direction);
+		   kajiya::Vec3::dot(object->normal(new_ray.origin).unit(),
+							 new_ray.direction.unit());
 }
 
 int main() {
@@ -214,8 +215,8 @@ int main() {
 		kajiya::Material::get_white());
 	objects.push_back(&tall_block_front);
 
-	const unsigned width  = 800;
-	const unsigned height = 800;
+	const unsigned width  = 400;
+	const unsigned height = 400;
 	float half_width	  = width / 2.f;
 	float half_height	  = height / 2.f;
 
@@ -224,7 +225,7 @@ int main() {
 	float camera_height = 0.025;
 	kajiya::Vec3 camera_position(278, 273, -800);
 
-	std::array<std::array<unsigned, width>, height> pixels;
+	std::vector<unsigned> pixels(width * height, 0);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 
@@ -257,7 +258,8 @@ int main() {
 			}
 			spectrum = spectrum / rays_per_pixel;
 
-			pixels[y][x] = spectrum_to_color(spectrum).clamp().to_hex();
+			pixels[y * width + x] =
+				spectrum_to_color(spectrum).clamp().to_hex();
 
 			++processed_pixels;
 			if (processed_pixels % two_percent_progress == 0) {

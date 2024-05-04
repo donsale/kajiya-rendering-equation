@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -std=c++20 -fopenmp -O2 -Wl,--stack,4194304
+CFLAGS = -std=c++20 -fopenmp -O2 
 LDFLAGS =
 
 # default target
