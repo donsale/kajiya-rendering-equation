@@ -17,7 +17,7 @@ void save(std::string filename,
 	std::ofstream out_ppm;
 	out_ppm.open(filename, std::ios_base::binary);
 	out_ppm << "P6\n" << width << " " << height << "\n255\n";
-	
+
 	for (const auto &innerArray : pixels) {
 		for (int val : innerArray) {
 			out_ppm << static_cast<char>((val >> 24) & 0xFF);
@@ -587,6 +587,7 @@ float cmf[471][3] = {{0.0001299, 0.000003917, 0.0006061},
 					 {0.000001341977, 0.0000004846123, 0},
 					 {0.000001251141, 0.00000045181, 0}};
 
+// https://www.fourmilab.ch/documents/specrend/specrend.c
 kajiya::Color xyz_to_rgb(double xc, double yc, double zc) {
 	double xr, yr, zr, xg, yg, zg, xb, yb, zb;
 	double xw, yw, zw;

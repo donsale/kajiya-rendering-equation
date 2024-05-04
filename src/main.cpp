@@ -28,7 +28,7 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 
 float pi		   = 3.1415926535897932;
 float bias		   = 0.00001;
-int max_depth	   = 3;
+int max_depth	   = 1;
 int rays_per_pixel = 10;
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
