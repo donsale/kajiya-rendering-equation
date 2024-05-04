@@ -28,8 +28,8 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 
 float pi		   = 3.1415926535897932;
 float bias		   = 0.00001;
-int max_depth	   = 2;
-int rays_per_pixel = 2;
+int max_depth	   = 3;
+int rays_per_pixel = 10;
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth);
@@ -41,21 +41,20 @@ kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 
 	// This part gives all white image (but code portion for this case hasn't
 	// been written below under if(intersection_point.has_value()) condition.
-	/*
-	if(depth == max_depth) {
-		closest = *std::find_if(objects.begin(), objects.end(), [&](auto const
-	&object) { return object->material().type == kajiya::Material::light;
-		});
-		// Hardcoded picking of first point of light for testing.
-		intersection_point =
-	std::optional<kajiya::Vec3>(dynamic_cast<kajiya::Rectangle*>(closest)->p1);
 
-	}
-	else {
-		closest			= trace_ray(ray, objects);
-		intersection_point = closest->intersect(ray);
-	}
-	//*/
+	// if (depth == max_depth) {
+	// 	closest = *std::find_if(
+	// 		objects.begin(), objects.end(), [&](auto const &object) {
+	// 			return object->material().type == kajiya::Material::light;
+	// 		});
+	// 	// Hardcoded picking of first point of light for testing.
+	// 	intersection_point = std::optional<kajiya::Vec3>(
+	// 		dynamic_cast<kajiya::Rectangle *>(closest)->p1);
+
+	// } else {
+	// 	closest			   = trace_ray(ray, objects);
+	// 	intersection_point = closest->intersect(ray);
+	// }
 
 	closest			   = trace_ray(ray, objects);
 	intersection_point = closest->intersect(ray);
@@ -81,10 +80,36 @@ kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 	return kajiya::Spectrum();
 }
 
+kajiya::Vec3 visible_light_corner(kajiya::Vec3 point,
+								  std::vector<kajiya::Hittable *> objects) {
+	kajiya::Vec3 p1(343.0, 548.8, 227.0);
+	kajiya::Vec3 p2(343.0, 548.8, 332.0);
+	kajiya::Vec3 p3(213.0, 548.8, 332.0);
+	kajiya::Vec3 p4(213.0, 548.8, 227.0);
+
+	std::vector<kajiya::Vec3> points = {p1, p2, p3, p4};
+
+	for (auto &p : points) {
+		kajiya::Ray ray(point, (p - point).unit());
+		auto closest = trace_ray(ray, objects);
+		if (!closest->intersect(ray).has_value())
+			return p;
+	}
+
+	return p1;
+}
+
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth) {
-	kajiya::Ray new_ray(
-		r.origin, rand_unit_vector_on_hemisphere(object->normal(r.origin)));
+
+	kajiya::Vec3 new_direction;
+	if (depth == max_depth - 1) {
+		new_direction = visible_light_corner(r.origin, objects) - r.origin;
+	} else {
+		new_direction =
+			rand_unit_vector_on_hemisphere(object->normal(r.origin));
+	}
+	kajiya::Ray new_ray(r.origin, new_direction);
 	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
 		   pi *
 		   kajiya::Vec3::dot(object->normal(new_ray.origin), new_ray.direction);
@@ -106,7 +131,7 @@ int main() {
 	kajiya::Rectangle light(
 		kajiya::Vec3(343.0, 548.8, 227.0), kajiya::Vec3(343.0, 548.8, 332.0),
 		kajiya::Vec3(213.0, 548.8, 332.0), kajiya::Vec3(213.0, 548.8, 227.0),
-		kajiya::Material::get_flashlight());
+		kajiya::Material::get_light());
 	objects.push_back(&light);
 	// ceiling, white
 	kajiya::Rectangle ceiling(
@@ -243,7 +268,7 @@ int main() {
 	auto end_time	 = std::chrono::high_resolution_clock::now();
 	auto render_time = std::chrono::duration_cast<std::chrono::milliseconds>(
 		end_time - start_time);
-	std::cout << " Render Time: " << render_time.count() / 1000.f << "s"
+	std::cout << "\nRender Time: " << render_time.count() / 1000.f << "s"
 			  << std::endl;
 
 	save<width, height>("image.ppm", pixels);
