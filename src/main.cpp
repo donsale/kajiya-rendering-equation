@@ -27,9 +27,9 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 }
 
 float pi		   = 3.1415926535897932;
-float bias		   = 0.00001;
+float bias		   = 0.0001;
 int max_depth	   = 1;
-int rays_per_pixel = 10;
+int rays_per_pixel = 1;
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth);
@@ -82,10 +82,10 @@ kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 
 kajiya::Vec3 visible_light_corner(kajiya::Vec3 point,
 								  std::vector<kajiya::Hittable *> objects) {
-	kajiya::Vec3 p1(343.0, 548.8, 227.0);
-	kajiya::Vec3 p2(343.0, 548.8, 332.0);
-	kajiya::Vec3 p3(213.0, 548.8, 332.0);
-	kajiya::Vec3 p4(213.0, 548.8, 227.0);
+	kajiya::Vec3 p1(342.0, 548.8, 228.0);
+	kajiya::Vec3 p2(342.0, 548.8, 331.0);
+	kajiya::Vec3 p3(214.0, 548.8, 331.0);
+	kajiya::Vec3 p4(214.0, 548.8, 228.0);
 
 	std::vector<kajiya::Vec3> points = {p1, p2, p3, p4};
 
@@ -109,6 +109,7 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 		new_direction =
 			rand_unit_vector_on_hemisphere(object->normal(r.origin));
 	}
+
 	kajiya::Ray new_ray(r.origin, new_direction);
 	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
 		   pi *
@@ -213,8 +214,8 @@ int main() {
 		kajiya::Material::get_white());
 	objects.push_back(&tall_block_front);
 
-	const unsigned width  = 400;
-	const unsigned height = 400;
+	const unsigned width  = 800;
+	const unsigned height = 800;
 	float half_width	  = width / 2.f;
 	float half_height	  = height / 2.f;
 
