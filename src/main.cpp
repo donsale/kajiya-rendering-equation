@@ -1,10 +1,10 @@
 #include "rectangle.h"
 #include "util.h"
 #include <algorithm>
+#include <atomic>
+#include <chrono>
 #include <iostream>
 #include <vector>
-#include <chrono>
-#include <atomic>
 
 kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 							std::vector<kajiya::Hittable *> objects) {
@@ -36,8 +36,29 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 
 kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 					int depth) {
-	auto closest			= trace_ray(ray, objects);
-	auto intersection_point = closest->intersect(ray);
+	kajiya::Hittable *closest;
+	std::optional<kajiya::Vec3> intersection_point;
+
+	// This part gives all white image (but code portion for this case hasn't
+	// been written below under if(intersection_point.has_value()) condition.
+	/*
+	if(depth == max_depth) {
+		closest = *std::find_if(objects.begin(), objects.end(), [&](auto const
+	&object) { return object->material().type == kajiya::Material::light;
+		});
+		// Hardcoded picking of first point of light for testing.
+		intersection_point =
+	std::optional<kajiya::Vec3>(dynamic_cast<kajiya::Rectangle*>(closest)->p1);
+
+	}
+	else {
+		closest			= trace_ray(ray, objects);
+		intersection_point = closest->intersect(ray);
+	}
+	//*/
+
+	closest			   = trace_ray(ray, objects);
+	intersection_point = closest->intersect(ray);
 
 	if (intersection_point.has_value()) {
 		auto surface_normal = closest->normal(intersection_point.value());
@@ -62,7 +83,8 @@ kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth) {
-	kajiya::Ray new_ray(r.origin, rand_unit_vector_on_hemisphere(object->normal(r.origin)));
+	kajiya::Ray new_ray(
+		r.origin, rand_unit_vector_on_hemisphere(object->normal(r.origin)));
 	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
 		   pi *
 		   kajiya::Vec3::dot(object->normal(new_ray.origin), new_ray.direction);
@@ -180,11 +202,12 @@ int main() {
 
 	auto start_time = std::chrono::high_resolution_clock::now();
 
-	int two_percent_progress = width*height / 50.f;
+	int two_percent_progress		  = width * height / 50.f;
 	std::atomic<int> processed_pixels = {};
 
-	std::cout << "__________________________________________________" << std::endl;
-	
+	std::cout << "__________________________________________________"
+			  << std::endl;
+
 #pragma omp parallel for collapse(2) shared(processed_pixels)
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
@@ -207,19 +230,21 @@ int main() {
 				spectrum = spectrum + Li(ray, objects, max_depth);
 			}
 			spectrum = spectrum / rays_per_pixel;
-			
+
 			pixels[y][x] = spectrum_to_color(spectrum).clamp().to_hex();
 
 			++processed_pixels;
-			if(processed_pixels % two_percent_progress == 0) {
+			if (processed_pixels % two_percent_progress == 0) {
 				std::cout << "#";
 			}
 		}
 	}
 
-	auto end_time = std::chrono::high_resolution_clock::now();
-	auto render_time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time);
-	std::cout << " Render Time: " << render_time.count() / 1000.f << "s" << std::endl;
+	auto end_time	 = std::chrono::high_resolution_clock::now();
+	auto render_time = std::chrono::duration_cast<std::chrono::milliseconds>(
+		end_time - start_time);
+	std::cout << " Render Time: " << render_time.count() / 1000.f << "s"
+			  << std::endl;
 
 	save<width, height>("image.ppm", pixels);
 
