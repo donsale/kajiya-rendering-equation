@@ -28,8 +28,8 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 
 float pi		   = 3.1415926535897932;
 float bias		   = 0.0001;
-int max_depth	   = 1;
-int rays_per_pixel = 3;
+int max_depth	   = 3;
+int rays_per_pixel = 10;
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth);
@@ -98,7 +98,7 @@ kajiya::Vec3 visible_light_corner(kajiya::Vec3 point,
 			return p;
 	}
 
-	return p3;
+	return p1;
 }
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
@@ -106,29 +106,29 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 
 	float hits_scaling = 1;
 	kajiya::Vec3 new_direction;
-	if (depth == max_depth - 1 &&
-		object->material().type != kajiya::Material::light) {
-		int hits = 0;
-
-		for (int i = 0; i < light_mesh.size(); ++i) {
-			for (int j = 0; j < light_mesh[i].size(); ++j) {
-				kajiya::Ray temp(r.origin,
-								 (light_mesh[i][j] - r.origin).unit());
-				auto closest = trace_ray(temp, objects);
-
-				if (closest->material().type == kajiya::Material::light) {
-					hits++;
-					new_direction = light_mesh[i][j] - r.origin;
-				}
-			}
-		}
-
-		hits_scaling = static_cast<float>(hits) /
-					   ((light_mesh.size() + 1) * (light_mesh[0].size() + 1));
-	} else {
+	//if (depth == max_depth - 1 &&
+	//	object->material().type != kajiya::Material::light) {
+	//	int hits = 0;
+	//
+	//	for (int i = 0; i < light_mesh.size(); ++i) {
+	//		for (int j = 0; j < light_mesh[i].size(); ++j) {
+	//			kajiya::Ray temp(r.origin,
+	//							 (light_mesh[i][j] - r.origin).unit());
+	//			auto closest = trace_ray(temp, objects);
+	//
+	//			if (closest->material().type == kajiya::Material::light) {
+	//				hits++;
+	//				new_direction = light_mesh[i][j] - r.origin;
+	//			}
+	//		}
+	//	}
+	//
+	//	hits_scaling = static_cast<float>(hits) /
+	//				   ((light_mesh.size() + 1) * (light_mesh[0].size() + 1));
+	//} else {
 		new_direction =
 			rand_unit_vector_on_hemisphere(object->normal(r.origin));
-	}
+		//}
 
 	kajiya::Ray new_ray(r.origin, new_direction);
 	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
@@ -304,7 +304,7 @@ int main() {
 			}
 			spectrum = spectrum / rays_per_pixel;
 
-			spectrum = spectrum * 0.0005;
+			spectrum = spectrum * 0.1;
 
 			pixels[y * width + x] =
 				spectrum_to_color(spectrum).clamp().to_hex();
