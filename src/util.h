@@ -643,11 +643,12 @@ kajiya::Color xyz_to_rgb(double xc, double yc, double zc) {
 									  (gx * xc) + (gy * yc) + (gz * zc),
 									  (bx * xc) + (by * yc) + (bz * zc));
 
-	return norm_rgb(rgb.r, rgb.g, rgb.b);
+	//	return norm_rgb(rgb.r, rgb.g, rgb.b);
+	return rgb;
 }
 
 kajiya::Color spectrum_to_color(kajiya::Spectrum spectrum) {
-	kajiya::Spectrum normalized = spectrum.normalize();
+	//kajiya::Spectrum normalized = spectrum.normalize();
 	float X = 0, Y = 0, Z = 0;
 	for (int i = 0; i < 471; i++) {
 		X += spectrum.spectrum[i] * cmf[i][0];
@@ -655,6 +656,7 @@ kajiya::Color spectrum_to_color(kajiya::Spectrum spectrum) {
 		Z += spectrum.spectrum[i] * cmf[i][2];
 	}
 	float sum = X + Y + Z;
+	sum = 1;
 	float x	  = X / sum;
 	float y	  = Y / sum;
 	float z	  = Z / sum;
@@ -669,6 +671,76 @@ kajiya::Color spectrum_to_color(kajiya::Spectrum spectrum) {
 	kajiya::Color gamma(gamma_correct(c.r), gamma_correct(c.g),
 						gamma_correct(c.b), 0);
 	return gamma;
+}
+
+float spectrum_luminance(kajiya::Spectrum spectrum) {
+	kajiya::Spectrum normalized = spectrum.normalize();
+	float X = 0, Y = 0, Z = 0;
+	for (int i = 0; i < 471; i++) {
+		X += spectrum.spectrum[i] * cmf[i][0];
+		Y += spectrum.spectrum[i] * cmf[i][1];
+		Z += spectrum.spectrum[i] * cmf[i][2];
+	}
+	//float sum = X + Y + Z;
+	//sum = 1;
+	//float x	  = X / sum;
+	//float y	  = Y / sum;
+	//float z	  = Z / sum;
+	
+	return (X + Y + Z) * 0.0006;
+}
+
+kajiya::Spectrum luminous_intensity() {
+	kajiya::Spectrum emittance;
+	
+	// Linear interpolation lambda function
+	auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
+
+	for (int i = 420; i <= 475; i++) {
+		emittance.spectrum[i - 360] =
+			lerp(0, 0.12, (i - 420.f) / (55.f));
+	}
+
+	for (int i = 475; i <= 560; i++) {
+		emittance.spectrum[i - 360] =
+			lerp(0.12, 1, (i - 475.f) / (85.f));
+	}
+
+	for (int i = 560; i <= 650; i++) {
+		emittance.spectrum[i - 360] =
+			lerp(1, 0.12, (i - 560.f) / 90.f);
+	}
+
+	for (int i = 650; i <= 700; i++) {
+		emittance.spectrum[i - 360] =
+			lerp(0.12, 0, (i - 650.f) / 50.f);
+	}
+
+	// speculation beyond 700
+	// for (int i = 700; i <= 830; i++) {
+	//	emittance.spectrum[i - 360] =
+	//		lerp(65, 60, (i - 700.f) / 130.f);
+	//}
+
+	emittance.normalize();
+
+	return emittance;
+}
+
+float spectrum_luminance_integrated(kajiya::Spectrum spectrum) {
+	kajiya::Spectrum li = luminous_intensity();
+	//kajiya::Spectrum normalized = spectrum.normalize();
+	float sum = 0;
+	for(int i = 0; i < 471; ++i) {
+		spectrum.spectrum[i] *= li.spectrum[i];
+	}
+	kajiya::Spectrum normalized = spectrum.normalize();
+	for(int i = 0; i < 471; ++i) {
+		sum += normalized.spectrum[i];
+	}
+
+	//std::cout << sum / 471 << std::endl;
+	return sum * 0.5;
 }
 
 float fresnel(kajiya::Vec3 I, kajiya::Vec3 N, float ior1, float ior2) {

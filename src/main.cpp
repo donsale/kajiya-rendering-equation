@@ -80,6 +80,8 @@ kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 	return kajiya::Spectrum();
 }
 
+std::vector<std::vector<kajiya::Vec3>> light_mesh;
+
 kajiya::Vec3 visible_light_corner(kajiya::Vec3 point,
 								  std::vector<kajiya::Hittable *> objects) {
 	kajiya::Vec3 p1(342.0, 548.8, 228.0);
@@ -110,17 +112,56 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 			rand_unit_vector_on_hemisphere(object->normal(r.origin));
 	}
 
+	int hits = 0;
+	for(int i = 0; i < light_mesh.size(); ++i) {
+		for(int j = 0; j < light_mesh[i].size(); ++j) {
+			kajiya::Ray temp(r.origin, (light_mesh[i][j] - r.origin).unit());
+			auto closest = trace_ray(temp, objects);
+			std::optional<kajiya::Vec3> p = closest->intersect(temp);
+			if(p.has_value() && p.value().y > 544) {
+				hits++;
+			}
+		}
+	}
+
+	float hits_scaling = static_cast<float>(hits) / ((light_mesh.size() + 1) * (light_mesh[0].size() + 1));
+
 	kajiya::Ray new_ray(r.origin, new_direction);
 	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
-		   pi *
+		   pi * hits_scaling *
 		   kajiya::Vec3::dot(object->normal(new_ray.origin).unit(),
 							 new_ray.direction.unit());
+}
+
+void generate_light_mesh(std::vector<std::vector<kajiya::Vec3>> &points, int n1, int n2) {
+	kajiya::Vec3 p1(342.0, 548.8, 228.0);
+	kajiya::Vec3 p2(342.0, 548.8, 331.0);
+	kajiya::Vec3 p3(214.0, 548.8, 331.0);
+	kajiya::Vec3 p4(214.0, 548.8, 228.0);
+
+	kajiya::Vec3 d1 = (p2 - p1);
+	kajiya::Vec3 d2 = (p4 - p1);
+
+	float d1s = d1.norm() / n1;
+	float d2s = d2.norm() / n2;
+
+	d1 = d1.unit() * d1s;
+	d2 = d2.unit() * d2s;
+
+	for(int i = 0; i <= n1; ++i) {
+		points.push_back(std::vector<kajiya::Vec3>());
+		for(int j = 0; j <= n2; ++j) {
+			points[i].push_back(p1 + (d1 * i) + (d2 * j));
+		}		
+	}
 }
 
 int main() {
 	srand(time(0));
 
 	std::vector<kajiya::Hittable *> objects;
+
+	generate_light_mesh(light_mesh, 5, 5);
 
 	// floor, white
 	kajiya::Rectangle floor(
@@ -258,8 +299,12 @@ int main() {
 			}
 			spectrum = spectrum / rays_per_pixel;
 
+			spectrum = spectrum * 0.0005;
+			
 			pixels[y * width + x] =
 				spectrum_to_color(spectrum).clamp().to_hex();
+
+			//pixels[y * width + x] = (spectrum_to_color(spectrum) * spectrum_luminance_integrated(spectrum)).clamp().to_hex();
 
 			++processed_pixels;
 			if (processed_pixels % two_percent_progress == 0) {
@@ -267,7 +312,7 @@ int main() {
 			}
 		}
 	}
-
+	
 	auto end_time	 = std::chrono::high_resolution_clock::now();
 	auto render_time = std::chrono::duration_cast<std::chrono::milliseconds>(
 		end_time - start_time);
