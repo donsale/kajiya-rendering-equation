@@ -36,8 +36,8 @@ kajiya::Vec3 rand_unit_vector_on_hemisphere(kajiya::Vec3 normal) {
 	rand_unit_vector = rand_unit_vector.unit();
 	float d			 = kajiya::Vec3::dot(rand_unit_vector, normal);
 	if (d < 0) {
-		//kajiya::Vec3 proj_vector = normal * d;
-		//rand_unit_vector		 = rand_unit_vector + proj_vector + proj_vector;
+		// kajiya::Vec3 proj_vector = normal * d;
+		// rand_unit_vector		 = rand_unit_vector + proj_vector + proj_vector;
 		rand_unit_vector = -rand_unit_vector;
 	}
 
@@ -643,11 +643,12 @@ kajiya::Color xyz_to_rgb(double xc, double yc, double zc) {
 									  (gx * xc) + (gy * yc) + (gz * zc),
 									  (bx * xc) + (by * yc) + (bz * zc));
 
-	return norm_rgb(rgb.r, rgb.g, rgb.b);
+	//	return norm_rgb(rgb.r, rgb.g, rgb.b);
+	return rgb;
 }
 
 kajiya::Color spectrum_to_color(kajiya::Spectrum spectrum) {
-	kajiya::Spectrum normalized = spectrum.normalize();
+	// kajiya::Spectrum normalized = spectrum.normalize();
 	float X = 0, Y = 0, Z = 0;
 	for (int i = 0; i < 471; i++) {
 		X += spectrum.spectrum[i] * cmf[i][0];
@@ -655,6 +656,7 @@ kajiya::Color spectrum_to_color(kajiya::Spectrum spectrum) {
 		Z += spectrum.spectrum[i] * cmf[i][2];
 	}
 	float sum = X + Y + Z;
+	sum		  = 1;
 	float x	  = X / sum;
 	float y	  = Y / sum;
 	float z	  = Z / sum;
