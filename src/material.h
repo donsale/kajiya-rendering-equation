@@ -5,7 +5,7 @@
 namespace kajiya {
 class Material {
 public:
-	enum material_type { white, red, green, light };
+	enum material_type { white, red, green, light, metal };
 	material_type type;
 	Spectrum reflectance;
 	Spectrum emittance;
@@ -300,13 +300,7 @@ public:
 
 		// Linear interpolation lambda function
 		auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
-
-		light.emittance.spectrum[360 - 360] = 6;
-		light.emittance.spectrum[408 - 360] = 4;
-		light.emittance.spectrum[470 - 360] = 100;
-		light.emittance.spectrum[500 - 360] = 83;
-		light.emittance.spectrum[700 - 360] = 65;
-
+		
 		for (int i = 360; i <= 408; i++) {
 			light.emittance.spectrum[i - 360] =
 				lerp(6, 4, (i - 360.f) / (48.f));
@@ -327,15 +321,68 @@ public:
 				lerp(83, 65, (i - 500.f) / 200.f);
 		}
 
-		// speculation beyond 700
-		// for (int i = 700; i <= 830; i++) {
-		//	light.emittance.spectrum[i - 360] =
-		//		lerp(65, 60, (i - 700.f) / 130.f);
-		//}
-
 		light.emittance.normalize();
 
 		return light;
+	}
+
+	static Material get_aluminum() {
+		Material aluminum;
+		aluminum.type = Material::metal;
+
+		// Linear interpolation lambda function
+		auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
+
+		for (int i = 360; i <= 500; i++) {
+			aluminum.reflectance.spectrum[i - 360] =
+				lerp(0.75, 0.78, (i - 360.f) / (140.f));
+		}
+
+		for (int i = 500; i <= 600; i++) {
+			aluminum.reflectance.spectrum[i - 360] =
+				lerp(0.78, 0.79, (i - 500.f) / (100.f));
+		}
+
+		for (int i = 600; i <= 700; i++) {
+			aluminum.reflectance.spectrum[i - 360] =
+				lerp(0.79, 0.78, (i - 600.f) / 100.f);
+		}
+
+		aluminum.reflectance.normalize();
+
+		return aluminum;
+	}
+
+	static Material get_gold() {
+		Material gold;
+		gold.type = Material::metal;
+
+		// Linear interpolation lambda function
+		auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
+
+		for (int i = 360; i <= 435; i++) {
+			gold.reflectance.spectrum[i - 360] =
+				lerp(0.33, 0.35, (i - 360.f) / (75.f));
+		}
+
+		for (int i = 435; i <= 490; i++) {
+			gold.reflectance.spectrum[i - 360] =
+				lerp(0.35, 0.33, (i - 435.f) / (55.f));
+		}
+
+		for (int i = 490; i <= 640; i++) {
+			gold.reflectance.spectrum[i - 360] =
+				lerp(0.33, 0.95, (i - 490.f) / 150.f);
+		}
+
+		for (int i = 640; i <= 700; i++) {
+			gold.reflectance.spectrum[i - 360] =
+				lerp(0.95, 0.97, (i - 640.f) / 60.f);
+		}
+
+		gold.reflectance.normalize();
+
+		return gold;
 	}
 };
 } // namespace kajiya

@@ -39,23 +39,6 @@ kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 	kajiya::Hittable *closest;
 	std::optional<kajiya::Vec3> intersection_point;
 
-	// This part gives all white image (but code portion for this case hasn't
-	// been written below under if(intersection_point.has_value()) condition.
-
-	// if (depth == max_depth) {
-	// 	closest = *std::find_if(
-	// 		objects.begin(), objects.end(), [&](auto const &object) {
-	// 			return object->material().type == kajiya::Material::light;
-	// 		});
-	// 	// Hardcoded picking of first point of light for testing.
-	// 	intersection_point = std::optional<kajiya::Vec3>(
-	// 		dynamic_cast<kajiya::Rectangle *>(closest)->p1);
-
-	// } else {
-	// 	closest			   = trace_ray(ray, objects);
-	// 	intersection_point = closest->intersect(ray);
-	// }
-
 	closest			   = trace_ray(ray, objects);
 	intersection_point = closest->intersect(ray);
 
@@ -106,6 +89,7 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 
 	float hits_scaling = 1;
 	kajiya::Vec3 new_direction;
+	float inverse_prob = 1;
 	//if (depth == max_depth - 1 &&
 	//	object->material().type != kajiya::Material::light) {
 	//	int hits = 0;
@@ -126,12 +110,20 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 	//	hits_scaling = static_cast<float>(hits) /
 	//				   ((light_mesh.size() + 1) * (light_mesh[0].size() + 1));
 	//} else {
+	if(object->material().type == kajiya::Material::metal) {
+		kajiya::Vec3 surface_normal = object->normal(r.origin);
+		new_direction = (r.direction).reflect_around(surface_normal);
+		inverse_prob = 1;
+    }
+	else {
 		new_direction =
 			rand_unit_vector_on_hemisphere(object->normal(r.origin));
+		inverse_prob = 2 * pi;
+	}
 		//}
 
 	kajiya::Ray new_ray(r.origin, new_direction);
-	return object->material().reflectance * Li(new_ray, objects, depth) * 2 *
+	return object->material().reflectance * Li(new_ray, objects, depth) * inverse_prob *
 		   hits_scaling *
 		   kajiya::Vec3::dot(object->normal(new_ray.origin).unit(),
 							 new_ray.direction.unit());
@@ -168,7 +160,7 @@ int main() {
 
 	generate_light_mesh(light_mesh, 5, 5);
 
-	// floor, white
+	// floor
 	kajiya::Rectangle floor(
 		kajiya::Vec3(552.8, 0.0, 0.0), kajiya::Vec3(0.0, 0.0, 0.0),
 		kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(549.6, 0.0, 559.2),
@@ -181,31 +173,31 @@ int main() {
 		kajiya::Vec3(213.0, 548.8, 332.0), kajiya::Vec3(213.0, 548.8, 227.0),
 		kajiya::Material::get_light());
 	objects.push_back(&light);
-	// ceiling, white
+	// ceiling
 	kajiya::Rectangle ceiling(
 		kajiya::Vec3(556.0, 548.8, 0.0), kajiya::Vec3(556.0, 548.8, 559.2),
 		kajiya::Vec3(0.0, 548.8, 559.2), kajiya::Vec3(0.0, 548.8, 0.0),
 		kajiya::Material::get_white());
 	objects.push_back(&ceiling);
-	// back wall, white
+	// back wall
 	kajiya::Rectangle back_wall(
 		kajiya::Vec3(549.6, 0.0, 559.2), kajiya::Vec3(0.0, 0.0, 559.2),
 		kajiya::Vec3(0.0, 548.8, 559.2), kajiya::Vec3(556.0, 548.8, 559.2),
-		kajiya::Material::get_white());
+		kajiya::Material::get_aluminum());
 	objects.push_back(&back_wall);
-	// right wall, green
+	// right wall
 	kajiya::Rectangle right_wall(
 		kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(0.0, 0.0, 0.0),
 		kajiya::Vec3(0.0, 548.8, 0.0), kajiya::Vec3(0.0, 548.8, 559.2),
 		kajiya::Material::get_green());
 	objects.push_back(&right_wall);
-	// left wall, red
+	// left wall
 	kajiya::Rectangle left_wall(
 		kajiya::Vec3(552.8, 0.0, 0.0), kajiya::Vec3(549.6, 0.0, 559.2),
 		kajiya::Vec3(556.0, 548.8, 559.2), kajiya::Vec3(556.0, 548.8, 0.0),
 		kajiya::Material::get_red());
 	objects.push_back(&left_wall);
-	// short block, white
+	// short block
 	kajiya::Rectangle short_block_top(
 		kajiya::Vec3(130.0, 165.0, 65.0), kajiya::Vec3(82.0, 165.0, 225.0),
 		kajiya::Vec3(240.0, 165.0, 272.0), kajiya::Vec3(290.0, 165.0, 114.0),
@@ -234,7 +226,7 @@ int main() {
 		kajiya::Material::get_white());
 	objects.push_back(&short_block_back);
 
-	// tall block, white
+	// tall block
 	kajiya::Rectangle tall_block_top(
 		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(265.0, 330.0, 296.0),
 		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(472.0, 330.0, 406.0),
