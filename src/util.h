@@ -24,6 +24,10 @@ void save(std::string filename, std::vector<unsigned> &pixels) {
 	}
 }
 
+float rand_float() {
+	return rand() / static_cast<float>(RAND_MAX);
+}
+
 // Maybe change with better (more uniform) custom rand generator later.
 float rand_float_minus_one_to_one() {
 	return rand() / static_cast<float>(RAND_MAX) * 2 - 1;

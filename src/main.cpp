@@ -28,8 +28,8 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 
 float pi		   = 3.1415926535897932;
 float bias		   = 0.0001;
-int max_depth	   = 3;
-int rays_per_pixel = 10;
+int max_depth	   = 5;
+int rays_per_pixel = 100;
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth);
@@ -51,6 +51,7 @@ kajiya::Spectrum Li(kajiya::Ray &ray, std::vector<kajiya::Hittable *> objects,
 				 : intersection_point.value() + surface_normal * bias);
 
 		kajiya::Ray new_ray = kajiya::Ray(new_origin, -ray.direction);
+		new_ray.refractive_index = ray.refractive_index;
 
 		kajiya::Spectrum spectrum = closest->material().emittance;
 
@@ -87,44 +88,81 @@ kajiya::Vec3 visible_light_corner(kajiya::Vec3 point,
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth) {
 
-	float hits_scaling = 1;
 	kajiya::Vec3 new_direction;
 	float inverse_prob = 1;
-	//if (depth == max_depth - 1 &&
-	//	object->material().type != kajiya::Material::light) {
-	//	int hits = 0;
-	//
-	//	for (int i = 0; i < light_mesh.size(); ++i) {
-	//		for (int j = 0; j < light_mesh[i].size(); ++j) {
-	//			kajiya::Ray temp(r.origin,
-	//							 (light_mesh[i][j] - r.origin).unit());
-	//			auto closest = trace_ray(temp, objects);
-	//
-	//			if (closest->material().type == kajiya::Material::light) {
-	//				hits++;
-	//				new_direction = light_mesh[i][j] - r.origin;
-	//			}
-	//		}
-	//	}
-	//
-	//	hits_scaling = static_cast<float>(hits) /
-	//				   ((light_mesh.size() + 1) * (light_mesh[0].size() + 1));
-	//} else {
+	kajiya::Spectrum relevant_object_spectrum;
+	
+
 	if(object->material().type == kajiya::Material::metal) {
+		inverse_prob = 1;
 		kajiya::Vec3 surface_normal = object->normal(r.origin);
 		new_direction = (r.direction).reflect_around(surface_normal);
-		inverse_prob = 1;
+		relevant_object_spectrum = object->material().reflectance;
     }
+	else if(object->material().type == kajiya::Material::glass) {
+		kajiya::Vec3 surface_normal = object->normal(r.origin);
+		float refractive_index_1 = r.refractive_index;
+		float refractive_index_2 = object->material().refractive_index;
+
+		float fresnel_reflection_coef = fresnel(-r.direction, surface_normal, refractive_index_1, refractive_index_2);
+		if(rand_float() < fresnel_reflection_coef) {
+			inverse_prob = 1.f / fresnel_reflection_coef;
+			new_direction = (r.direction).reflect_around(surface_normal);
+			relevant_object_spectrum = object->material().reflectance;
+		}
+		else {
+			inverse_prob = 1.f / (1 - fresnel_reflection_coef);
+			inverse_prob *= 0.003; // Experimentation.
+
+			// Handle case when ray travels within object.
+			bool ray_is_internal_to_object =
+				kajiya::Vec3::dot(-r.direction, surface_normal) > 0;
+			if (ray_is_internal_to_object) {
+				surface_normal = -surface_normal;
+			}
+
+			float refractive_index = refractive_index_1 / refractive_index_2;
+			float C1 = kajiya::Vec3::dot(r.direction, surface_normal) /
+				(r.direction.norm());
+			float total_internal_reflection_indicator =
+				1 - refractive_index * refractive_index * (1 - C1 * C1);
+			float C2 = std::sqrt(total_internal_reflection_indicator);
+
+			// Form refraction ray.
+			new_direction =
+				(-r.direction * refractive_index +
+				 surface_normal * (refractive_index * C1 - C2))
+				.unit();
+
+			r.direction = -r.direction;
+			std::optional<kajiya::Vec3> intersection_point_opt = object->intersect(r);
+			kajiya::Vec3 intersection_point;
+			if(intersection_point_opt.has_value()) {
+				intersection_point = intersection_point_opt.value();
+			}
+
+			r.origin =
+				(kajiya::Vec3::dot(new_direction, surface_normal) < 0
+				 ? intersection_point - surface_normal * bias
+				 : intersection_point + surface_normal * bias);
+			
+			// If there is no total internal reflection.
+			r.refractive_index = refractive_index_2;
+
+			relevant_object_spectrum = object->material().transmittance;
+		}
+	}
 	else {
 		new_direction =
 			rand_unit_vector_on_hemisphere(object->normal(r.origin));
 		inverse_prob = 2 * pi;
+		relevant_object_spectrum = object->material().reflectance;
 	}
-		//}
 
 	kajiya::Ray new_ray(r.origin, new_direction);
-	return object->material().reflectance * Li(new_ray, objects, depth) * inverse_prob *
-		   hits_scaling *
+	new_ray.refractive_index = r.refractive_index;
+
+	return relevant_object_spectrum * Li(new_ray, objects, depth) * inverse_prob *
 		   kajiya::Vec3::dot(object->normal(new_ray.origin).unit(),
 							 new_ray.direction.unit());
 }
@@ -183,7 +221,7 @@ int main() {
 	kajiya::Rectangle back_wall(
 		kajiya::Vec3(549.6, 0.0, 559.2), kajiya::Vec3(0.0, 0.0, 559.2),
 		kajiya::Vec3(0.0, 548.8, 559.2), kajiya::Vec3(556.0, 548.8, 559.2),
-		kajiya::Material::get_aluminum());
+		kajiya::Material::get_white());
 	objects.push_back(&back_wall);
 	// right wall
 	kajiya::Rectangle right_wall(
@@ -230,27 +268,27 @@ int main() {
 	kajiya::Rectangle tall_block_top(
 		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(265.0, 330.0, 296.0),
 		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(472.0, 330.0, 406.0),
-		kajiya::Material::get_white());
+		kajiya::Material::get_glass());
 	objects.push_back(&tall_block_top);
 	kajiya::Rectangle tall_block_left(
 		kajiya::Vec3(423.0, 0.0, 247.0), kajiya::Vec3(423.0, 330.0, 247.0),
 		kajiya::Vec3(472.0, 330.0, 406.0), kajiya::Vec3(472.0, 0.0, 406.0),
-		kajiya::Material::get_white());
+		kajiya::Material::get_glass());
 	objects.push_back(&tall_block_left);
 	kajiya::Rectangle tall_block_back(
 		kajiya::Vec3(472.0, 0.0, 406.0), kajiya::Vec3(472.0, 330.0, 406.0),
 		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(314.0, 0.0, 456.0),
-		kajiya::Material::get_white());
+		kajiya::Material::get_glass());
 	objects.push_back(&tall_block_back);
 	kajiya::Rectangle tall_block_right(
 		kajiya::Vec3(314.0, 0.0, 456.0), kajiya::Vec3(314.0, 330.0, 456.0),
 		kajiya::Vec3(265.0, 330.0, 296.0), kajiya::Vec3(265.0, 0.0, 296.0),
-		kajiya::Material::get_white());
+		kajiya::Material::get_glass());
 	objects.push_back(&tall_block_right);
 	kajiya::Rectangle tall_block_front(
 		kajiya::Vec3(265.0, 0.0, 296.0), kajiya::Vec3(265.0, 330.0, 296.0),
 		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(423.0, 0.0, 247.0),
-		kajiya::Material::get_white());
+		kajiya::Material::get_glass());
 	objects.push_back(&tall_block_front);
 
 	const unsigned width  = 400;
