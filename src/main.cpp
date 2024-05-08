@@ -28,8 +28,8 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 
 float pi		   = 3.1415926535897932;
 float bias		   = 0.0001;
-int max_depth	   = 5;
-int rays_per_pixel = 100;
+int max_depth	   = 3;
+int rays_per_pixel = 50;
 
 kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 					std::vector<kajiya::Hittable *> objects, int depth);
@@ -112,7 +112,7 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 		}
 		else {
 			inverse_prob = 1.f / (1 - fresnel_reflection_coef);
-			inverse_prob *= 0.003; // Experimentation.
+			inverse_prob *= 0.006; // Experimentation.
 
 			// Handle case when ray travels within object.
 			bool ray_is_internal_to_object =
@@ -155,7 +155,7 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 	else {
 		new_direction =
 			rand_unit_vector_on_hemisphere(object->normal(r.origin));
-		inverse_prob = 2 * pi;
+		inverse_prob = 2;
 		relevant_object_spectrum = object->material().reflectance;
 	}
 
@@ -268,27 +268,27 @@ int main() {
 	kajiya::Rectangle tall_block_top(
 		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(265.0, 330.0, 296.0),
 		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(472.0, 330.0, 406.0),
-		kajiya::Material::get_glass());
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_top);
 	kajiya::Rectangle tall_block_left(
 		kajiya::Vec3(423.0, 0.0, 247.0), kajiya::Vec3(423.0, 330.0, 247.0),
 		kajiya::Vec3(472.0, 330.0, 406.0), kajiya::Vec3(472.0, 0.0, 406.0),
-		kajiya::Material::get_glass());
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_left);
 	kajiya::Rectangle tall_block_back(
 		kajiya::Vec3(472.0, 0.0, 406.0), kajiya::Vec3(472.0, 330.0, 406.0),
 		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(314.0, 0.0, 456.0),
-		kajiya::Material::get_glass());
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_back);
 	kajiya::Rectangle tall_block_right(
 		kajiya::Vec3(314.0, 0.0, 456.0), kajiya::Vec3(314.0, 330.0, 456.0),
 		kajiya::Vec3(265.0, 330.0, 296.0), kajiya::Vec3(265.0, 0.0, 296.0),
-		kajiya::Material::get_glass());
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_right);
 	kajiya::Rectangle tall_block_front(
 		kajiya::Vec3(265.0, 0.0, 296.0), kajiya::Vec3(265.0, 330.0, 296.0),
 		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(423.0, 0.0, 247.0),
-		kajiya::Material::get_glass());
+		kajiya::Material::get_white());
 	objects.push_back(&tall_block_front);
 
 	const unsigned width  = 400;
