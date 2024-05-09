@@ -5,13 +5,13 @@
 namespace kajiya {
 class Material {
 public:
-	enum material_type { white, red, green, light, metal, glass};
+	enum material_type { white, red, green, light, metal, glass };
 	material_type type;
 	Spectrum reflectance;
 	Spectrum emittance;
 	Spectrum transmittance;
 	float refractive_index;
-	
+
 	static Material get_white() {
 		Material white;
 		white.type = Material::white;
@@ -293,6 +293,8 @@ public:
 		// 	printf("%2.6f\n", light.emittance.spectrum[i]);
 		// }
 
+		light.emittance.normalize();
+
 		return light;
 	}
 
@@ -302,7 +304,7 @@ public:
 
 		// Linear interpolation lambda function
 		auto lerp = [](float a, float b, float t) { return a + (b - a) * t; };
-		
+
 		for (int i = 360; i <= 408; i++) {
 			light.emittance.spectrum[i - 360] =
 				lerp(6, 4, (i - 360.f) / (48.f));
@@ -389,7 +391,7 @@ public:
 
 	static Material get_glass() {
 		Material glass;
-		glass.type = Material::glass;
+		glass.type			   = Material::glass;
 		glass.refractive_index = 1.54f;
 
 		// Linear interpolation lambda function
@@ -402,10 +404,10 @@ public:
 		for (int i = 360; i <= 700; i++) {
 			glass.transmittance.spectrum[i - 360] = 97;
 		}
-		
+
 		glass.reflectance.normalize();
 		glass.transmittance.normalize();
-		
+
 		return glass;
 	}
 };
