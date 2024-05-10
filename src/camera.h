@@ -15,7 +15,9 @@ public:
 	Vec3 z_axis;
 
 	Camera(Vec3 p, float w, float h, float fl, Vec3 forward, Vec3 up)
-		: position(p), screen_width(w), screen_height(h), focal_length(fl), z_axis(forward.unit()), y_axis(up.unit()), x_axis(Vec3::cross(y_axis, z_axis).unit()){
+		: position(p), screen_width(w), screen_height(h), focal_length(fl),
+		  z_axis(forward.unit()), y_axis(up.unit()),
+		  x_axis(Vec3::cross(y_axis, z_axis).unit()) {
 	}
 
 	Vec3 focus() {
