@@ -1,3 +1,5 @@
+#include "camera.h"
+#include "loader.h"
 #include "rectangle.h"
 #include "util.h"
 #include <algorithm>
@@ -6,10 +8,16 @@
 #include <iostream>
 #include <vector>
 
-float pi			   = 3.1415926535897932;
-float bias			   = 0.0001;
-int max_depth		   = 2;
-int rays_per_pixel	   = 10;
+// Renderer parameters.
+float pi			  = 3.1415926535897932;
+float bias			  = 0.0001;
+int max_depth		  = 2;
+int rays_per_pixel	  = 10;
+const unsigned width  = 300;
+const unsigned height = 300;
+float half_width	  = width / 2.f;
+float half_height	  = height / 2.f;
+
 kajiya::Material LIGHT = kajiya::Material::get_light();
 float LIGHT_AREA	   = 13184;
 
@@ -200,111 +208,13 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 int main() {
 	srand(time(0));
 
-	std::vector<kajiya::Hittable *> objects;
+	std::vector<kajiya::Hittable *> objects =
+		kajiya::Loader::load_cornell_box();
 
-	// floor
-	kajiya::Rectangle floor(
-		kajiya::Vec3(552.8, 0.0, 0.0), kajiya::Vec3(0.0, 0.0, 0.0),
-		kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(549.6, 0.0, 559.2),
-		kajiya::Material::get_white());
+	kajiya::Camera camera(kajiya::Vec3(278, 273, -800), 0.025, 0.025, 0.035,
+						  kajiya::Vec3(0, 0, 1), kajiya::Vec3(0, 1, 0));
 
-	objects.push_back(&floor);
-	// light
-	kajiya::Rectangle light(
-		kajiya::Vec3(343.0, 548.8, 227.0), kajiya::Vec3(343.0, 548.8, 332.0),
-		kajiya::Vec3(213.0, 548.8, 332.0), kajiya::Vec3(213.0, 548.8, 227.0),
-		kajiya::Material::get_light());
-	objects.push_back(&light);
-	// ceiling
-	kajiya::Rectangle ceiling(
-		kajiya::Vec3(556.0, 548.8, 0.0), kajiya::Vec3(556.0, 548.8, 559.2),
-		kajiya::Vec3(0.0, 548.8, 559.2), kajiya::Vec3(0.0, 548.8, 0.0),
-		kajiya::Material::get_white());
-	objects.push_back(&ceiling);
-	// back wall
-	kajiya::Rectangle back_wall(
-		kajiya::Vec3(549.6, 0.0, 559.2), kajiya::Vec3(0.0, 0.0, 559.2),
-		kajiya::Vec3(0.0, 548.8, 559.2), kajiya::Vec3(556.0, 548.8, 559.2),
-		kajiya::Material::get_white());
-	objects.push_back(&back_wall);
-	// right wall
-	kajiya::Rectangle right_wall(
-		kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(0.0, 0.0, 0.0),
-		kajiya::Vec3(0.0, 548.8, 0.0), kajiya::Vec3(0.0, 548.8, 559.2),
-		kajiya::Material::get_green());
-	objects.push_back(&right_wall);
-	// left wall
-	kajiya::Rectangle left_wall(
-		kajiya::Vec3(552.8, 0.0, 0.0), kajiya::Vec3(549.6, 0.0, 559.2),
-		kajiya::Vec3(556.0, 548.8, 559.2), kajiya::Vec3(556.0, 548.8, 0.0),
-		kajiya::Material::get_red());
-	objects.push_back(&left_wall);
-	// short block
-	kajiya::Rectangle short_block_top(
-		kajiya::Vec3(130.0, 165.0, 65.0), kajiya::Vec3(82.0, 165.0, 225.0),
-		kajiya::Vec3(240.0, 165.0, 272.0), kajiya::Vec3(290.0, 165.0, 114.0),
-		kajiya::Material::get_white());
-	objects.push_back(&short_block_top);
-	kajiya::Rectangle short_block_left(
-		kajiya::Vec3(290.0, 0.0, 114.0), kajiya::Vec3(290.0, 165.0, 114.0),
-		kajiya::Vec3(240.0, 165.0, 272.0), kajiya::Vec3(240.0, 0.0, 272.0),
-		kajiya::Material::get_white());
-	objects.push_back(&short_block_left);
-	kajiya::Rectangle short_block_front(
-		kajiya::Vec3(130.0, 0.0, 65.0), kajiya::Vec3(130.0, 165.0, 65.0),
-		kajiya::Vec3(290.0, 165.0, 114.0), kajiya::Vec3(290.0, 0.0, 114.0),
-		kajiya::Material::get_white());
-
-	objects.push_back(&short_block_front);
-	kajiya::Rectangle short_block_right(
-		kajiya::Vec3(82.0, 0.0, 225.0), kajiya::Vec3(82.0, 165.0, 225.0),
-		kajiya::Vec3(130.0, 165.0, 65.0), kajiya::Vec3(130.0, 0.0, 65.0),
-		kajiya::Material::get_white());
-
-	objects.push_back(&short_block_right);
-	kajiya::Rectangle short_block_back(
-		kajiya::Vec3(240.0, 0.0, 272.0), kajiya::Vec3(240.0, 165.0, 272.0),
-		kajiya::Vec3(82.0, 165.0, 225.0), kajiya::Vec3(82.0, 0.0, 225.0),
-		kajiya::Material::get_white());
-	objects.push_back(&short_block_back);
-
-	// tall block
-	kajiya::Rectangle tall_block_top(
-		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(265.0, 330.0, 296.0),
-		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(472.0, 330.0, 406.0),
-		kajiya::Material::get_white());
-	objects.push_back(&tall_block_top);
-	kajiya::Rectangle tall_block_left(
-		kajiya::Vec3(423.0, 0.0, 247.0), kajiya::Vec3(423.0, 330.0, 247.0),
-		kajiya::Vec3(472.0, 330.0, 406.0), kajiya::Vec3(472.0, 0.0, 406.0),
-		kajiya::Material::get_white());
-	objects.push_back(&tall_block_left);
-	kajiya::Rectangle tall_block_back(
-		kajiya::Vec3(472.0, 0.0, 406.0), kajiya::Vec3(472.0, 330.0, 406.0),
-		kajiya::Vec3(314.0, 330.0, 456.0), kajiya::Vec3(314.0, 0.0, 456.0),
-		kajiya::Material::get_white());
-	objects.push_back(&tall_block_back);
-	kajiya::Rectangle tall_block_right(
-		kajiya::Vec3(314.0, 0.0, 456.0), kajiya::Vec3(314.0, 330.0, 456.0),
-		kajiya::Vec3(265.0, 330.0, 296.0), kajiya::Vec3(265.0, 0.0, 296.0),
-		kajiya::Material::get_white());
-	objects.push_back(&tall_block_right);
-	kajiya::Rectangle tall_block_front(
-		kajiya::Vec3(265.0, 0.0, 296.0), kajiya::Vec3(265.0, 330.0, 296.0),
-		kajiya::Vec3(423.0, 330.0, 247.0), kajiya::Vec3(423.0, 0.0, 247.0),
-		kajiya::Material::get_white());
-	objects.push_back(&tall_block_front);
-
-	const unsigned width  = 300;
-	const unsigned height = 300;
-	float half_width	  = width / 2.f;
-	float half_height	  = height / 2.f;
-
-	kajiya::Vec3 camera_focal_length(0, 0, 0.035);
-	float camera_width	= 0.025;
-	float camera_height = 0.025;
-	kajiya::Vec3 camera_position(278, 273, -800);
-
+	// Rendering.
 	std::vector<unsigned> pixels(width * height, 0);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -319,11 +229,14 @@ int main() {
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
 			kajiya::Vec3 normalized_image_plane_pixel(
-				(1 - x / half_width) * camera_width / 2.f + camera_position.x,
-				(1 - y / half_height) * camera_height / 2.f + camera_position.y,
-				camera_position.z);
+				(1 - x / half_width) * camera.screen_width / 2.f +
+					camera.position.x,
+				(1 - y / half_height) * camera.screen_height / 2.f +
+					camera.position.y,
+				camera.position.z);
 
-			kajiya::Vec3 focal_point = camera_position - camera_focal_length;
+			kajiya::Vec3 focal_point = camera.focus();
+
 			kajiya::Ray ray(
 				focal_point,
 				(normalized_image_plane_pixel - focal_point).unit());
