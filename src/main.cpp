@@ -9,7 +9,7 @@
 #include <vector>
 
 // Renderer parameters.
-float pi			  = 3.1415926535897932;
+
 float bias			  = 0.0001;
 int max_depth		  = 2;
 int rays_per_pixel	  = 10;
@@ -214,7 +214,6 @@ int main() {
 	kajiya::Camera camera(kajiya::Vec3(278, 273, -800), 0.025, 0.025, 0.035,
 						  kajiya::Vec3(0, 0, 1), kajiya::Vec3(0, 1, 0));
 
-	// Rendering.
 	std::vector<unsigned> pixels(width * height, 0);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
