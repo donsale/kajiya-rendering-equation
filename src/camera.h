@@ -1,6 +1,8 @@
 #pragma once
 
 #include "vec3.h"
+#include "util.h"
+#include <cmath>
 
 namespace kajiya {
 class Camera {
@@ -22,6 +24,34 @@ public:
 
 	Vec3 focus() {
 		return Vec3(position - z_axis * focal_length);
+	}
+
+	void zoom(float a) {
+		focal_length *= a;
+	}
+
+	//cos -sin;
+	//sin cos;
+	void rotate_x() {
+		
+	}
+
+	void rotate_y_deg(float a) {
+		a = pi / 180 * a;
+		float cos_a = std::cos(a);
+		float sin_a = std::sin(a);
+		Vec3 new_x_axis(cos_a*x_axis.x - sin_a*x_axis.z,
+						x_axis.y,
+						sin_a*x_axis.x + cos_a*x_axis.z);
+		Vec3 new_z_axis(cos_a*z_axis.x - sin_a*z_axis.z,
+						z_axis.y,
+						sin_a*z_axis.x + cos_a*z_axis.z);
+		x_axis = new_x_axis;
+		z_axis = new_z_axis;
+	}
+
+	void rotate_z() {
+		
 	}
 };
 } // namespace kajiya

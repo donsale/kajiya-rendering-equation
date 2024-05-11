@@ -11,6 +11,8 @@
 #include <map>
 #include <vector>
 
+float pi			  = 3.1415926535897932;
+
 template <unsigned int width, int height>
 void save(std::string filename, std::vector<unsigned> &pixels) {
 	std::ofstream out_ppm;
