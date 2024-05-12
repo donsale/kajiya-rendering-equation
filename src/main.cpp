@@ -214,6 +214,8 @@ int main() {
 	kajiya::Camera camera(kajiya::Vec3(278, 273, -800), 0.025, 0.025, 0.035,
 						  kajiya::Vec3(0, 0, 1), kajiya::Vec3(0, 1, 0));
 
+	camera.rotate_z_deg(30);
+
 	std::vector<unsigned> pixels(width * height, 0);
 
 	auto start_time = std::chrono::high_resolution_clock::now();
@@ -227,12 +229,13 @@ int main() {
 #pragma omp parallel for collapse(2) shared(processed_pixels)
 	for (int y = 0; y < height; ++y) {
 		for (int x = 0; x < width; ++x) {
-			kajiya::Vec3 normalized_image_plane_pixel(
-				(1 - x / half_width) * camera.screen_width / 2.f +
-					camera.position.x,
-				(1 - y / half_height) * camera.screen_height / 2.f +
-					camera.position.y,
-				camera.position.z);
+			float normalized_x = (1 - x / half_width);
+			float normalized_y = (1 - y / half_height);
+
+			kajiya::Vec3 normalized_image_plane_pixel =
+				camera.position +
+				camera.x_axis * normalized_x * camera.screen_width / 2.f +
+				camera.y_axis * normalized_y * camera.screen_height / 2.f;
 
 			kajiya::Vec3 focal_point = camera.focus();
 
