@@ -9,15 +9,11 @@
 #include <iostream>
 #include <vector>
 
-// Renderer parameters.
-
 float bias			  = 0.0001;
 int max_depth		  = 2;
 int rays_per_pixel	  = 10;
 const unsigned width  = 300;
 const unsigned height = 300;
-float half_width	  = width / 2.f;
-float half_height	  = height / 2.f;
 
 kajiya::Material LIGHT = kajiya::Material::get_light();
 float LIGHT_AREA	   = 13184;
@@ -215,8 +211,6 @@ int main() {
 
 	kajiya::Camera camera(kajiya::Vec3(278, 273, -800), 0.025, 0.025, 0.035,
 						  kajiya::Vec3(0, 0, 1), kajiya::Vec3(0, 1, 0));
-
-	camera.rotate_z_deg(30);
 
 	kajiya::Renderer renderer(camera, objects);
 	std::vector<unsigned> pixels =
