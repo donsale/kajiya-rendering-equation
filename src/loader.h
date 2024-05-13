@@ -69,7 +69,6 @@ public:
 			kajiya::Vec3(265.0, 330.0, 296.0),
 			kajiya::Vec3(314.0, 330.0, 456.0),
 			kajiya::Vec3(472.0, 330.0, 406.0), kajiya::Material::get_white()));
-
 		objects.push_back(new kajiya::Rectangle(
 			kajiya::Vec3(423.0, 0.0, 247.0), kajiya::Vec3(423.0, 330.0, 247.0),
 			kajiya::Vec3(472.0, 330.0, 406.0), kajiya::Vec3(472.0, 0.0, 406.0),

@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "loader.h"
 #include "rectangle.h"
+#include "renderer.h"
 #include "util.h"
 #include <algorithm>
 #include <atomic>
@@ -131,6 +132,7 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 		float fresnel_reflection_coef =
 			fresnel(-r.direction, surface_normal, refractive_index_1,
 					refractive_index_2);
+
 		if (rand_float() < fresnel_reflection_coef) {
 			brdf_over_probability = 1.f / fresnel_reflection_coef;
 			new_direction = (r.direction).reflect_around(surface_normal);
@@ -216,59 +218,9 @@ int main() {
 
 	camera.rotate_z_deg(30);
 
-	std::vector<unsigned> pixels(width * height, 0);
-
-	auto start_time = std::chrono::high_resolution_clock::now();
-
-	int two_percent_progress		  = width * height / 50.f;
-	std::atomic<int> processed_pixels = {};
-
-	std::cout << "__________________________________________________"
-			  << std::endl;
-
-#pragma omp parallel for collapse(2) shared(processed_pixels)
-	for (int y = 0; y < height; ++y) {
-		for (int x = 0; x < width; ++x) {
-			float normalized_x = (1 - x / half_width);
-			float normalized_y = (1 - y / half_height);
-
-			kajiya::Vec3 normalized_image_plane_pixel =
-				camera.position +
-				camera.x_axis * normalized_x * camera.screen_width / 2.f +
-				camera.y_axis * normalized_y * camera.screen_height / 2.f;
-
-			kajiya::Vec3 focal_point = camera.focus();
-
-			kajiya::Ray ray(
-				focal_point,
-				(normalized_image_plane_pixel - focal_point).unit());
-
-			ray.refractive_index = 1.0f;
-
-			kajiya::Spectrum spectrum;
-			for (int i = 0; i < rays_per_pixel; ++i) {
-				spectrum = spectrum + Li(ray, objects, max_depth);
-			}
-			spectrum = spectrum / rays_per_pixel;
-
-			spectrum = spectrum * 0.2;
-
-			pixels[y * width + x] =
-				spectrum_to_color(spectrum).clamp().to_hex();
-
-			++processed_pixels;
-			if (processed_pixels % two_percent_progress == 0) {
-				std::cout << "#";
-			}
-		}
-	}
-
-	auto end_time	 = std::chrono::high_resolution_clock::now();
-	auto render_time = std::chrono::duration_cast<std::chrono::milliseconds>(
-		end_time - start_time);
-	std::cout << "\nRender Time: " << render_time.count() / 1000.f << "s"
-			  << std::endl;
-
+	kajiya::Renderer renderer(camera, objects);
+	std::vector<unsigned> pixels =
+		renderer.render(width, height, max_depth, rays_per_pixel);
 	save<width, height>("image.ppm", pixels);
 
 	return 0;
