@@ -59,10 +59,10 @@ public:
 		a			= pi / 180 * a;
 		float cos_a = std::cos(a);
 		float sin_a = std::sin(a);
-		Vec3 new_x_axis(cos_a * x_axis.x + sin_a * x_axis.y,
-						-sin_a * x_axis.x + cos_a * x_axis.y, x_axis.z);
-		Vec3 new_y_axis(cos_a * y_axis.x + sin_a * y_axis.y,
-						-sin_a * y_axis.x + cos_a * y_axis.y, y_axis.z);
+		Vec3 new_x_axis(cos_a * x_axis.x - sin_a * x_axis.y,
+						sin_a * x_axis.x + cos_a * x_axis.y, x_axis.z);
+		Vec3 new_y_axis(cos_a * y_axis.x - sin_a * y_axis.y,
+						sin_a * y_axis.x + cos_a * y_axis.y, y_axis.z);
 		x_axis = new_x_axis;
 		y_axis = new_y_axis;
 	}
