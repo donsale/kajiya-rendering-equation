@@ -1,5 +1,7 @@
 #pragma once
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
 #include "hittable.h"
 #include "material.h"
 #include "rectangle.h"
@@ -11,17 +13,18 @@ class Loader {
 public:
 	static std::vector<Hittable *> load_cornell_box() {
 		std::vector<kajiya::Hittable *> objects;
-		// floor
-		objects.push_back(new kajiya::Rectangle(
-			kajiya::Vec3(552.8, 0.0, 0.0), kajiya::Vec3(0.0, 0.0, 0.0),
-			kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(549.6, 0.0, 559.2),
-			kajiya::Material::get_white()));
+		
 		// light
 		objects.push_back(new kajiya::Rectangle(
 			kajiya::Vec3(343.0, 548.8, 227.0),
 			kajiya::Vec3(343.0, 548.8, 332.0),
 			kajiya::Vec3(213.0, 548.8, 332.0),
 			kajiya::Vec3(213.0, 548.8, 227.0), kajiya::Material::get_light()));
+		// floor
+		objects.push_back(new kajiya::Rectangle(
+			kajiya::Vec3(552.8, 0.0, 0.0), kajiya::Vec3(0.0, 0.0, 0.0),
+			kajiya::Vec3(0.0, 0.0, 559.2), kajiya::Vec3(549.6, 0.0, 559.2),
+			kajiya::Material::get_white()));
 		// ceiling
 		objects.push_back(new kajiya::Rectangle(
 			kajiya::Vec3(556.0, 548.8, 0.0), kajiya::Vec3(556.0, 548.8, 559.2),
