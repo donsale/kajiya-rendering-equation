@@ -4,22 +4,20 @@
 #include "hittable.h"
 #include "ray.h"
 #include "vec3.h"
+#include "material.h"
 #include <iostream>
 #include <optional>
 
 namespace kajiya {
-class Triangle {
+class Triangle : public Hittable {
 public:
 	Vec3 p1, p2, p3, n;
+	Material m;
 
-	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n) : p1(p1), p2(p2), p3(p3), n(n) {
+	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n, Material m) : p1(p1), p2(p2), p3(p3), n(n), m(m) {
 	}
 
 	std::optional<Vec3> intersect(Ray &r) const {
-		// G = p1
-		// n = n
-		// A = r.origin
-		// B = r.direction
 		float ray_parallel_with_plane_indicator = Vec3::dot(r.direction, n);
 
 		// Ray is parallel
@@ -53,6 +51,14 @@ public:
 
 		return std::nullopt;
 	}
+
+	Vec3 normal(Vec3 &intersection_point) const {
+		return n;
+	}
+	
+	Material material() const {
+		return m;
+	}
 };
 
 class Rectangle : public Hittable {
@@ -63,10 +69,10 @@ public:
 
 	Rectangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4, Material m)
 		: p1(p1), p2(p2), p3(p3), p4(p4), m(m),
-		  n(Vec3::cross(p2 - p1, p4 - p1).unit()), t1(Triangle(p1, p2, p3, n)),
+		  n(Vec3::cross(p2 - p1, p4 - p1).unit()), t1(Triangle(p1, p2, p3, n, m)),
 		  // p3, p4, p1 gives black diagonal on left wall (tested on depth 2,
 		  // ray 50)
-		  t2(Triangle(p1, p3, p4, n)) {
+		  t2(Triangle(p1, p3, p4, n, m)) {
 	}
 
 	std::optional<Vec3> intersect(Ray &r) const {
@@ -83,7 +89,7 @@ public:
 		return m;
 	}
 
-	Vec3 normal(Vec3 &point) const {
+	Vec3 normal(Vec3 &intersection_point) const {
 		return n;
 	}
 };
