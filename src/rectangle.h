@@ -14,6 +14,14 @@ public:
 	Vec3 p1, p2, p3, n;
 	Material m;
 
+	Triangle() {
+		p1 = Vec3();
+		p2 = Vec3();
+		p3 = Vec3();
+		n = Vec3();
+		m = Material::get_white();
+	}
+
 	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n, Material m) : p1(p1), p2(p2), p3(p3), n(n), m(m) {
 	}
 

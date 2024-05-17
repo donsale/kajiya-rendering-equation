@@ -88,6 +88,7 @@ kajiya::Spectrum Lr(kajiya::Hittable *object, kajiya::Ray &r,
 	if (object->material().type != kajiya::Material::light) {
 		float rand_light_z = 228 + (331 - 228) * rand_float();
 		float rand_light_x = 214 + (342 - 214) * rand_float();
+		
 		kajiya::Vec3 light_dist_vec =
 			kajiya::Vec3(rand_light_x, 548.8, rand_light_z) - r.origin;
 		kajiya::Ray light_ray(r.origin, light_dist_vec.unit());
