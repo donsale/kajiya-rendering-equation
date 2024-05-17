@@ -3,6 +3,9 @@
 #include <cmath>
 #include <iostream>
 
+#include "glm/vec3.hpp"
+#include "glm/vec4.hpp"
+
 namespace kajiya {
 class Vec3 {
 public:
@@ -69,6 +72,22 @@ public:
 
 	void print() const {
 		std::printf("(%2.6f, %2.6f, %2.6f)\n", x, y, z);
+	}
+
+	glm::vec3 to_glm_vec3() {
+		return glm::vec3(x, y, z);
+	}
+
+	glm::vec4 to_glm_vec4() {
+		return glm::vec4(x, y, z, 1);
+	}
+
+	static Vec3 from_glm_vec3(glm::vec3 v) {
+		return Vec3(v.x, v.y, v.z);
+	}
+
+	static Vec3 from_glm_vec4(glm::vec4 v) {
+		return Vec3(v.x, v.y, v.z);
 	}
 };
 } // namespace kajiya
