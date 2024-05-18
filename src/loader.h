@@ -86,7 +86,7 @@ public:
 					triangles.push_back(new Triangle(temp.p1, temp.p2, temp.p3, temp.n, temp.m));
 				}
 
-				// TODO(stekap): More efficient way to represent meshes.
+				// TODO(stekap): More efficient way to represent meshes. (currently it is just array of triangles)
 				// TODO(stekap): Incorporate per vertex normals.
 				// TODO(stekap): Handle material and color.
 
