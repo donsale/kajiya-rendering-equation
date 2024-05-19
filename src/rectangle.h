@@ -84,6 +84,7 @@ public:
 		return m;
 	}
 
+	// NOTE(stekap): Check with mesh that has different triangle vertex normals.
 	BarycentricCoords barycentric_coords_for(Vec3 intersection_point) const {
 		Vec3 c1 = Vec3::cross(intersection_point - p1, p2 - p1);
 		Vec3 c2 = Vec3::cross(intersection_point - p2, p3 - p2);
