@@ -11,8 +11,7 @@ class Mesh : public Hittable {
 public:
 	// bounding box
 
-	// TODO(stekap): Black points appear on rendered mesh. Bias should probably
-	// be introduced somewhere.
+	// TODO(stekap): Black points appear on rendered mesh. Maybe bias somewhere???
 
 	std::vector<Triangle> triangles;
 
