@@ -17,7 +17,7 @@
 namespace kajiya {
 class Loader {
 public:
-	static std::vector<Triangle*> load_obj(std::string inputfile) {
+	static Mesh* load_obj(std::string inputfile) {
 		tinyobj::ObjReaderConfig reader_config;
 		reader_config.mtl_search_path = "./assets";
 
@@ -37,7 +37,7 @@ public:
 		auto& shapes = reader.GetShapes();
 		auto& materials = reader.GetMaterials();
 
-		std::vector<Triangle*> triangles;
+		Mesh* mesh = new Mesh();
 		Triangle temp;
 		temp.m = Material::get_white();
 
@@ -51,25 +51,25 @@ public:
 
 				// NOTE(stekap): Not storage efficient.
 				for(int i = 1; i < current_face_vertices_num - 1; ++i) {
-					tinyobj::index_t idx_1 = shapes[shape_index].mesh.indices[index_offset + 0];
-					tinyobj::index_t idx_2 = shapes[shape_index].mesh.indices[index_offset + i];
-					tinyobj::index_t idx_3 = shapes[shape_index].mesh.indices[index_offset + i + 1];
+					tinyobj::index_t idx_0 = shapes[shape_index].mesh.indices[index_offset + 0];
+					tinyobj::index_t idx_1 = shapes[shape_index].mesh.indices[index_offset + i];
+					tinyobj::index_t idx_2 = shapes[shape_index].mesh.indices[index_offset + i + 1];
 					
-					temp.p1 = Vec3(attrib.vertices[3*size_t(idx_1.vertex_index) + 0],
+					temp.p1 = Vec3(attrib.vertices[3*size_t(idx_0.vertex_index) + 0],
+								   attrib.vertices[3*size_t(idx_0.vertex_index) + 1],
+								   attrib.vertices[3*size_t(idx_0.vertex_index) + 2]);
+					temp.p2 = Vec3(attrib.vertices[3*size_t(idx_1.vertex_index) + 0],
 								   attrib.vertices[3*size_t(idx_1.vertex_index) + 1],
 								   attrib.vertices[3*size_t(idx_1.vertex_index) + 2]);
-					temp.p2 = Vec3(attrib.vertices[3*size_t(idx_2.vertex_index) + 0],
+					temp.p3 = Vec3(attrib.vertices[3*size_t(idx_2.vertex_index) + 0],
 								   attrib.vertices[3*size_t(idx_2.vertex_index) + 1],
 								   attrib.vertices[3*size_t(idx_2.vertex_index) + 2]);
-					temp.p3 = Vec3(attrib.vertices[3*size_t(idx_3.vertex_index) + 0],
-								   attrib.vertices[3*size_t(idx_3.vertex_index) + 1],
-								   attrib.vertices[3*size_t(idx_3.vertex_index) + 2]);
 
 					// NOTE(stekap): For now, we take normal at one point and set it as triangle normal.
 					if(idx_1.normal_index >= 0) {
-						temp.n = Vec3(attrib.normals[3*size_t(idx_1.normal_index) + 0],
-									  attrib.normals[3*size_t(idx_1.normal_index) + 1],
-									  attrib.normals[3*size_t(idx_1.normal_index) + 2]);
+						temp.n = Vec3(attrib.normals[3*size_t(idx_0.normal_index) + 0],
+									  attrib.normals[3*size_t(idx_0.normal_index) + 1],
+									  attrib.normals[3*size_t(idx_0.normal_index) + 2]);
 					}
 
 					// Check if `texcoord_index` is zero or positive. negative = no texcoord data
@@ -83,7 +83,7 @@ public:
 					// tinyobj::real_t green = attrib.colors[3*size_t(idx.vertex_index)+1];
 					// tinyobj::real_t blue  = attrib.colors[3*size_t(idx.vertex_index)+2];
 
-					triangles.push_back(new Triangle(temp.p1, temp.p2, temp.p3, temp.n, temp.m));
+					mesh->triangles.push_back(temp);
 				}
 
 				// TODO(stekap): More efficient way to represent meshes. (currently it is just array of triangles)
@@ -94,9 +94,9 @@ public:
 			}
 		}
 
-		return triangles;
+		return mesh;
 	}
-	
+
 	static std::vector<Hittable*> load_cornell_box() {
 		std::vector<kajiya::Hittable *> objects;
 
@@ -105,14 +105,16 @@ public:
 		glm::mat4 obj_transform = glm::scale(obj_translation, glm::vec3(100, 100, 100));
 
 		
-		std::vector<Triangle*> triangles = load_obj("assets/icosahedron.obj");
+		Mesh* icosahedron = load_obj("assets/icosahedron.obj");
 		
-		for(Triangle*& t : triangles) {
-			t->p1 = Vec3::from_glm_vec4(obj_transform * t->p1.to_glm_vec4());
-			t->p2 = Vec3::from_glm_vec4(obj_transform * t->p2.to_glm_vec4());
-			t->p3 = Vec3::from_glm_vec4(obj_transform * t->p3.to_glm_vec4());
-			objects.push_back(t);
-		}
+		//for(Hittable*& h : icosahedron->triangles) {
+		//	Triangle* t = reinterpret_cast<Triangle*>(h);
+		//	t->p1 = Vec3::from_glm_vec4(obj_transform * t->p1.to_glm_vec4());
+		//	t->p2 = Vec3::from_glm_vec4(obj_transform * t->p2.to_glm_vec4());
+		//	t->p3 = Vec3::from_glm_vec4(obj_transform * t->p3.to_glm_vec4());
+		//}
+		//
+		//objects.push_back(icosahedron);
 		
 		// light
 		objects.push_back(new kajiya::Rectangle(

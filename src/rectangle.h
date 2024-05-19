@@ -25,7 +25,7 @@ public:
 	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n, Material m) : p1(p1), p2(p2), p3(p3), n(n), m(m) {
 	}
 
-	std::optional<Vec3> intersect(Ray &r) const {
+	std::optional<IntersectionData> intersect(Ray &r) const {
 		float ray_parallel_with_plane_indicator = Vec3::dot(r.direction, n);
 
 		// Ray is parallel
@@ -52,7 +52,7 @@ public:
 			// Equality for when the point is on the edge of the triangle.
 			if ((d1 <= 0 && d2 <= 0 && d3 <= 0) ||
 				(d1 >= 0 && d2 >= 0 && d3 >= 0))
-				return intersection_point;
+				return (IntersectionData) { intersection_point, -1 };
 			else
 				return std::nullopt;
 		}
@@ -60,11 +60,11 @@ public:
 		return std::nullopt;
 	}
 
-	Vec3 normal(Vec3 &intersection_point) const {
+	Vec3 normal(IntersectionData &intersection_data) const {
 		return n;
 	}
 	
-	Material material() const {
+	Material material(IntersectionData &intersection_data) const {
 		return m;
 	}
 };
@@ -83,7 +83,7 @@ public:
 		  t2(Triangle(p1, p3, p4, n, m)) {
 	}
 
-	std::optional<Vec3> intersect(Ray &r) const {
+	std::optional<IntersectionData> intersect(Ray &r) const {
 		auto t1_result = t1.intersect(r);
 
 		if (!t1_result.has_value()) {
@@ -93,12 +93,12 @@ public:
 		return t1_result;
 	}
 
-	Material material() const {
-		return m;
-	}
-
-	Vec3 normal(Vec3 &intersection_point) const {
+	Vec3 normal(IntersectionData &intersection_data) const {
 		return n;
+	}
+	
+	Material material(IntersectionData &intersection_data) const {
+		return m;
 	}
 };
 } // namespace kajiya
