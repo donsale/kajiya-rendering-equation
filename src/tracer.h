@@ -82,6 +82,7 @@ kajiya::Spectrum Lr(kajiya::Hittable *object,
 
 	// Direct light sampling (just one light for now).
 	if (object->material(intersection_data).type != kajiya::Material::light) {
+		// TODO(stekap): Hardcoded. Separate lights from other objects.
 		float rand_light_z = 228 + (331 - 228) * rand_float();
 		float rand_light_x = 214 + (342 - 214) * rand_float();
 

@@ -11,7 +11,12 @@
 namespace kajiya {
 class Triangle : public Hittable {
 public:
-	Vec3 p1, p2, p3, n;
+	Vec3 p1, p2, p3;
+	Vec3 n1, n2, n3; // Not used until barycentric interpolation is introduced.
+
+	// TODO(stekap): Remove when barycentric interpolation is introduced.
+	Vec3 n;
+	
 	Material m;
 
 	Triangle() {
@@ -22,8 +27,10 @@ public:
 		m  = Material::get_white();
 	}
 
-	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n, Material m)
+	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n1, Vec3 n2, Vec3 n3, Material m)
 		: p1(p1), p2(p2), p3(p3), n(n), m(m) {
+
+		n = n1;
 	}
 
 	std::optional<IntersectionData> intersect(Ray &r) const {
@@ -79,10 +86,10 @@ public:
 	Rectangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4, Material m)
 		: p1(p1), p2(p2), p3(p3), p4(p4), m(m),
 		  n(Vec3::cross(p2 - p1, p4 - p1).unit()),
-		  t1(Triangle(p1, p2, p3, n, m)),
+		  t1(Triangle(p1, p2, p3, n, n, n, m)),
 		  // p3, p4, p1 gives black diagonal on left wall (tested on depth 2,
 		  // ray 50)
-		  t2(Triangle(p1, p3, p4, n, m)) {
+		  t2(Triangle(p1, p3, p4, n, n, n, m)) {
 	}
 
 	std::optional<IntersectionData> intersect(Ray &r) const {
