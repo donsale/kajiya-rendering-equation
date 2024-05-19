@@ -14,8 +14,8 @@ struct IntersectionData {
 
 class Hittable {
 public:
-	virtual std::optional<IntersectionData> intersect(Ray &r) const = 0;
-	virtual Vec3 normal(IntersectionData &intersection_data) const = 0;
+	virtual std::optional<IntersectionData> intersect(Ray &r) const		 = 0;
+	virtual Vec3 normal(IntersectionData &intersection_data) const		 = 0;
 	virtual Material material(IntersectionData &intersection_data) const = 0;
 };
 

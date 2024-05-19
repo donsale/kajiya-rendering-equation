@@ -2,9 +2,9 @@
 
 #include "color.h"
 #include "hittable.h"
+#include "material.h"
 #include "ray.h"
 #include "vec3.h"
-#include "material.h"
 #include <iostream>
 #include <optional>
 
@@ -18,11 +18,12 @@ public:
 		p1 = Vec3();
 		p2 = Vec3();
 		p3 = Vec3();
-		n = Vec3();
-		m = Material::get_white();
+		n  = Vec3();
+		m  = Material::get_white();
 	}
 
-	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n, Material m) : p1(p1), p2(p2), p3(p3), n(n), m(m) {
+	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n, Material m)
+		: p1(p1), p2(p2), p3(p3), n(n), m(m) {
 	}
 
 	std::optional<IntersectionData> intersect(Ray &r) const {
@@ -52,7 +53,7 @@ public:
 			// Equality for when the point is on the edge of the triangle.
 			if ((d1 <= 0 && d2 <= 0 && d3 <= 0) ||
 				(d1 >= 0 && d2 >= 0 && d3 >= 0))
-				return (IntersectionData) { intersection_point, -1 };
+				return (IntersectionData){intersection_point, -1};
 			else
 				return std::nullopt;
 		}
@@ -63,7 +64,7 @@ public:
 	Vec3 normal(IntersectionData &intersection_data) const {
 		return n;
 	}
-	
+
 	Material material(IntersectionData &intersection_data) const {
 		return m;
 	}
@@ -77,7 +78,8 @@ public:
 
 	Rectangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4, Material m)
 		: p1(p1), p2(p2), p3(p3), p4(p4), m(m),
-		  n(Vec3::cross(p2 - p1, p4 - p1).unit()), t1(Triangle(p1, p2, p3, n, m)),
+		  n(Vec3::cross(p2 - p1, p4 - p1).unit()),
+		  t1(Triangle(p1, p2, p3, n, m)),
 		  // p3, p4, p1 gives black diagonal on left wall (tested on depth 2,
 		  // ray 50)
 		  t2(Triangle(p1, p3, p4, n, m)) {
@@ -96,7 +98,7 @@ public:
 	Vec3 normal(IntersectionData &intersection_data) const {
 		return n;
 	}
-	
+
 	Material material(IntersectionData &intersection_data) const {
 		return m;
 	}
