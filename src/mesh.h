@@ -3,56 +3,54 @@
 #include "rectangle.h"
 #include "hittable.h"
 #include "tracer.h"
+#include <limits>
 #include <vector>
 
 namespace kajiya {
 class Mesh : public Hittable {
 public:
-	// vertices
-	// number of faces
-	// face index (array holding info about polygons degrees)
-	// indices
 	// bounding box
 
+	// TODO(stekap): Black points appear on rendered mesh. Bias should probably be introduced somewhere.
+
 	std::vector<Triangle> triangles;
-	//std::vector<Triangle*> buffer;
 
 	virtual std::optional<IntersectionData> intersect(Ray &r) const {
-		Triangle t = trace_mesh_triangles(r);
-		std::optional<IntersectionData> intersection_data = t.intersect(r);
+		int primitive_index = trace_mesh_triangles(r);
 
-		if(intersection_data.has_value()) {
-			return intersection_data.value();
+		if(primitive_index == -1) return std::nullopt;
+		
+		std::optional<IntersectionData> intersection_data_opt = triangles[primitive_index].intersect(r);
+
+		if(intersection_data_opt.has_value()) {
+			intersection_data_opt.value().primitive_index = primitive_index;
+			return intersection_data_opt;
 		}
 		
 		return std::nullopt;
 	}
 
 	virtual Vec3 normal(IntersectionData &intersection_data) const {
-		return Vec3(0, 0, 0);
+		return triangles[intersection_data.primitive_index].normal(intersection_data);
 	}
 
 	virtual Material material(IntersectionData &intersection_data) const {
 		return Material::get_white();
 	}
 
-	Triangle trace_mesh_triangles(Ray &ray) const {
-		return *std::min_element(
-		triangles.begin(), triangles.end(),
-		[&ray](const Triangle t1, const Triangle t2) {
-			auto result1 = t1.intersect(ray);
-			auto result2 = t2.intersect(ray);
+	int trace_mesh_triangles(Ray &ray) const {
+		int primitive_index = -1;
+		float closest_distance = std::numeric_limits<float>::max();
+		for(int i = 0; i < triangles.size(); ++i) {
+			std::optional<IntersectionData> intersection_data_opt = triangles[i].intersect(ray);
 
-			if (result1.has_value() && result2.has_value()) {
-				return result1.value().point.norm() < result2.value().point.norm();
-			} else if (result1.has_value()) {
-				return true;
-			} else if (result2.has_value()) {
-				return false;
-			} else {
-				return true;
+			if(intersection_data_opt.has_value() && intersection_data_opt.value().point.norm() < closest_distance) {
+				closest_distance = intersection_data_opt.value().point.norm();
+				primitive_index = i;
 			}
-		});
+		}
+
+		return primitive_index;
 	}
 };
 }

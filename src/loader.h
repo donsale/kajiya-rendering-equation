@@ -101,20 +101,19 @@ public:
 		std::vector<kajiya::Hittable *> objects;
 
 		glm::mat4 obj_translation = glm::translate(glm::mat4(1.0f),
-												   glm::vec3(150, 350, 350));
+												   glm::vec3(150, 350, 450));
 		glm::mat4 obj_transform = glm::scale(obj_translation, glm::vec3(100, 100, 100));
 
 		
 		Mesh* icosahedron = load_obj("assets/icosahedron.obj");
 		
-		//for(Hittable*& h : icosahedron->triangles) {
-		//	Triangle* t = reinterpret_cast<Triangle*>(h);
-		//	t->p1 = Vec3::from_glm_vec4(obj_transform * t->p1.to_glm_vec4());
-		//	t->p2 = Vec3::from_glm_vec4(obj_transform * t->p2.to_glm_vec4());
-		//	t->p3 = Vec3::from_glm_vec4(obj_transform * t->p3.to_glm_vec4());
-		//}
-		//
-		//objects.push_back(icosahedron);
+		for(Triangle& t : icosahedron->triangles) {
+			t.p1 = Vec3::from_glm_vec4(obj_transform * t.p1.to_glm_vec4());
+			t.p2 = Vec3::from_glm_vec4(obj_transform * t.p2.to_glm_vec4());
+			t.p3 = Vec3::from_glm_vec4(obj_transform * t.p3.to_glm_vec4());
+		}
+		
+		objects.push_back(icosahedron);
 		
 		// light
 		objects.push_back(new kajiya::Rectangle(

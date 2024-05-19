@@ -1,8 +1,8 @@
 #pragma once
 
 float bias			  = 0.0001;
-int max_depth		  = 2;
-int rays_per_pixel	  = 10;
+int max_depth		  = 5;
+int rays_per_pixel	  = 100;
 const unsigned width  = 300;
 const unsigned height = 300;
 
