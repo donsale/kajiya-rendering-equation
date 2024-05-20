@@ -7,6 +7,19 @@
 #include <vector>
 
 namespace kajiya {
+struct BoundingBox {
+	Vec3 min_point;
+	Vec3 max_point;
+
+	BoundingBox() {
+		float minf = std::numeric_limits<float>::min();
+		float maxf = std::numeric_limits<float>::max();
+		
+		min_point = Vec3(maxf, maxf, maxf);
+		max_point = Vec3(minf, minf, minf);
+	}
+};
+
 class Mesh : public Hittable {
 public:
 	// bounding box
