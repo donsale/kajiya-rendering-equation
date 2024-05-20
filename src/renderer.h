@@ -69,7 +69,7 @@ public:
 
 				++processed_pixels;
 				if (processed_pixels % two_percent_progress == 0) {
-					std::cout << "#";
+					std::cout << "#" << std::flush;
 				}
 			}
 		}
