@@ -11,7 +11,8 @@ struct IntersectionData {
 	Vec3 point;
 	int primitive_index;
 
-	IntersectionData(Vec3 p, int pi) : point(p), primitive_index(pi) {}
+	IntersectionData(Vec3 p, int pi) : point(p), primitive_index(pi) {
+	}
 };
 
 class Hittable {

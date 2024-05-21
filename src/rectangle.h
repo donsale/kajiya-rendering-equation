@@ -13,15 +13,16 @@ struct BarycentricCoords {
 	//    p1 p2 p3
 	float u, v, w;
 
-	BarycentricCoords(float u, float v, float w) : u(u), v(v), w(w) {}
+	BarycentricCoords(float u, float v, float w) : u(u), v(v), w(w) {
+	}
 };
-	
+
 class Triangle : public Hittable {
 public:
 	// NOTE(stekap): Maybe pack vertex attributes.
 	Vec3 p1, p2, p3;
 	Vec3 n1, n2, n3; // Not used until barycentric interpolation is introduced.
-	
+
 	Material m;
 
 	Triangle() {
@@ -41,7 +42,8 @@ public:
 	std::optional<IntersectionData> intersect(Ray &r) const {
 		Vec3 plane_normal = Vec3::cross(p2 - p1, p3 - p1).unit();
 
-		float ray_parallel_with_plane_indicator = Vec3::dot(r.direction, plane_normal);
+		float ray_parallel_with_plane_indicator =
+			Vec3::dot(r.direction, plane_normal);
 
 		// Ray is parallel
 		if (ray_parallel_with_plane_indicator < 0.0005 &&
@@ -50,8 +52,8 @@ public:
 			return std::nullopt;
 		}
 
-		float t =
-			Vec3::dot((p1 - r.origin), plane_normal) / ray_parallel_with_plane_indicator;
+		float t = Vec3::dot((p1 - r.origin), plane_normal) /
+				  ray_parallel_with_plane_indicator;
 
 		if (t > 0) {
 			Vec3 intersection_point = r.value(t);
@@ -91,7 +93,7 @@ public:
 		Vec3 c3 = Vec3::cross(intersection_point - p3, p1 - p3);
 
 		float triangle_area = Vec3::cross(p2 - p1, p3 - p1).norm();
-		
+
 		return BarycentricCoords(c2.norm() / triangle_area,
 								 c3.norm() / triangle_area,
 								 c1.norm() / triangle_area);

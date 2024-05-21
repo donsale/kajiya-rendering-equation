@@ -99,7 +99,7 @@ public:
 					}
 
 					// TODO(stekap): Handle material, texture, color.
-					
+
 					// Check if `texcoord_index` is zero or positive. negative =
 					// no texcoord data if (idx.texcoord_index >= 0) {
 					// 	tinyobj::real_t tx =
