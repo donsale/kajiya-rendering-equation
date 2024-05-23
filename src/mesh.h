@@ -24,9 +24,6 @@ class Mesh : public Hittable {
 public:
 	// bounding box
 
-	// TODO(stekap): Black points appear on rendered mesh. Maybe bias
-	// somewhere???
-
 	std::vector<Triangle> triangles;
 
 	virtual std::optional<IntersectionData> intersect(Ray &r) const {

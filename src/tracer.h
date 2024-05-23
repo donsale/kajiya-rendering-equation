@@ -3,8 +3,8 @@
 float bias			  = 0.0002;
 int max_depth		  = 2;
 int rays_per_pixel	  = 10;
-const unsigned width  = 600;
-const unsigned height = 600;
+const unsigned width  = 300;
+const unsigned height = 300;
 
 kajiya::Material LIGHT = kajiya::Material::get_light();
 float LIGHT_AREA	   = 13184;
@@ -111,7 +111,8 @@ kajiya::Spectrum Lr(kajiya::Hittable *object,
 					(intersection_data_opt_temp.value().point - r.origin)
 						.unit());
 
-				if(light_dot < 0) light_dot = 0;
+				if (light_dot < 0)
+					light_dot = 0;
 
 				direct_light_contribution =
 					LIGHT.emittance * light_direction_probability * light_dot;

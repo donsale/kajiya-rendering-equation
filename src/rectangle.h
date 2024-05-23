@@ -58,20 +58,34 @@ public:
 		if (t > 0) {
 			Vec3 intersection_point = r.value(t);
 
-			Vec3 c1 = Vec3::cross(intersection_point - p1, p2 - p1);
-			Vec3 c2 = Vec3::cross(intersection_point - p2, p3 - p2);
-			Vec3 c3 = Vec3::cross(intersection_point - p3, p1 - p3);
+			// Vec3 c1 = Vec3::cross(intersection_point - p1, p2 - p1);
+			// Vec3 c2 = Vec3::cross(intersection_point - p2, p3 - p2);
+			// Vec3 c3 = Vec3::cross(intersection_point - p3, p1 - p3);
+			//
+			// float d1 = Vec3::dot(c1, plane_normal);
+			// float d2 = Vec3::dot(c2, plane_normal);
+			// float d3 = Vec3::dot(c3, plane_normal);
+			//
+			//// Equality for when the point is on the edge of the triangle.
+			// if ((d1 <= 0 && d2 <= 0 && d3 <= 0) ||
+			//	(d1 >= 0 && d2 >= 0 && d3 >= 0))
+			//	return IntersectionData(intersection_point, -1);
+			// else
+			//	return std::nullopt;
 
-			float d1 = Vec3::dot(c1, plane_normal);
-			float d2 = Vec3::dot(c2, plane_normal);
-			float d3 = Vec3::dot(c3, plane_normal);
+			BarycentricCoords bc = barycentric_coords_for(intersection_point);
 
-			// Equality for when the point is on the edge of the triangle.
-			if ((d1 <= 0 && d2 <= 0 && d3 <= 0) ||
-				(d1 >= 0 && d2 >= 0 && d3 >= 0))
-				return (IntersectionData){intersection_point, -1};
-			else
-				return std::nullopt;
+			// TODO(stekap): Simplify condition.
+			// TODO(stekap): Use only two bary coords.
+
+			float bias = 0.00001;
+			if (bc.v >= 0 && bc.v <= 1 && bc.w >= 0 && bc.w <= 1 && bc.u >= 0 &&
+				bc.u <= 1 && bc.u + bc.v + bc.w <= 1 + bias &&
+				bc.u + bc.v + bc.w >= 0 - bias) {
+				// std::cout << "(" << bc.u << ", " << bc.v << ", " << bc.w <<
+				// ")" << std::endl;
+				return IntersectionData(intersection_point, -1);
+			}
 		}
 
 		return std::nullopt;
