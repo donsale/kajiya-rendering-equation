@@ -1,10 +1,10 @@
 #pragma once
 
 float bias			  = 0.0002;
-int max_depth		  = 10;
-int rays_per_pixel	  = 50;
-const unsigned width  = 300;
-const unsigned height = 300;
+int max_depth		  = 2;
+int rays_per_pixel	  = 10;
+const unsigned width  = 600;
+const unsigned height = 600;
 
 kajiya::Material LIGHT = kajiya::Material::get_light();
 float LIGHT_AREA	   = 13184;
@@ -29,6 +29,8 @@ kajiya::Hittable *trace_ray(kajiya::Ray &ray,
 			}
 		});
 }
+
+// TODO(stekap): Change retarded names.
 
 kajiya::Spectrum Lr(kajiya::Hittable *object,
 					kajiya::IntersectionData &intersection_data, kajiya::Ray &r,
@@ -108,6 +110,8 @@ kajiya::Spectrum Lr(kajiya::Hittable *object,
 					object->normal(intersection_data),
 					(intersection_data_opt_temp.value().point - r.origin)
 						.unit());
+
+				if(light_dot < 0) light_dot = 0;
 
 				direct_light_contribution =
 					LIGHT.emittance * light_direction_probability * light_dot;
@@ -206,8 +210,6 @@ kajiya::Spectrum Lr(kajiya::Hittable *object,
 					   probability;
 		}
 	}
-
-	direct_light_contribution.positive();
 
 	return incoming + direct_light_contribution * brdf * preservation *
 						  relevant_object_spectrum;
