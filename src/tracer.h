@@ -1,8 +1,8 @@
 #pragma once
 
 float bias			  = 0.0002;
-int max_depth		  = 2;
-int rays_per_pixel	  = 10;
+int max_depth		  = 10;
+int rays_per_pixel	  = 50;
 const unsigned width  = 300;
 const unsigned height = 300;
 
@@ -206,6 +206,8 @@ kajiya::Spectrum Lr(kajiya::Hittable *object,
 					   probability;
 		}
 	}
+
+	direct_light_contribution.positive();
 
 	return incoming + direct_light_contribution * brdf * preservation *
 						  relevant_object_spectrum;

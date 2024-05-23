@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <iostream>
 
 namespace kajiya {
 class Spectrum {
@@ -69,6 +70,33 @@ public:
 		}
 
 		return result;
+	}
+
+	void print() {
+		std::cout << "[ ";
+		for(int i = 0; i < number_of_frequenices; ++i) {
+			std::cout << spectrum[i] << ", ";
+			if(i % 10 == 0) std::cout << std::endl;
+		}
+		std::cout << "]" << std::endl;
+	}
+
+	void print_if_negative() {
+		bool negative = false;
+		for(int i = 0; i < number_of_frequenices; ++i) {
+			if(spectrum[i] < 0) {
+				negative = true;
+				break;
+			}
+		}
+
+		if(negative) print();
+	}
+
+	void positive() {
+		for(int i = 0; i < number_of_frequenices; ++i) {
+			if (spectrum[i] < 0) spectrum[i] = 0;
+		}
 	}
 };
 
