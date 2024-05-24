@@ -38,6 +38,9 @@ public:
 		std::cout << "__________________________________________________"
 				  << std::endl;
 
+		// TODO(stekap): Make this automatic without guessing the number.
+		float aalias_factor = 10;
+		
 #pragma omp parallel for collapse(2) shared(processed_pixels)
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
@@ -58,7 +61,9 @@ public:
 
 				Spectrum spectrum;
 				for (int i = 0; i < rays_per_pixel; ++i) {
-					spectrum = spectrum + Li(ray, objects, max_depth);
+					kajiya::Ray temp_ray = ray;
+					temp_ray.direction = temp_ray.direction + rand_unit_vector_on_hemisphere(temp_ray.direction)* (rand_float() * camera.screen_width / (float)width * aalias_factor);
+					spectrum = spectrum + Li(temp_ray, objects, max_depth);
 				}
 				spectrum = spectrum / rays_per_pixel;
 
