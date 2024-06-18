@@ -1,23 +1,49 @@
+#pragma once
+
 #include "color.h"
 #include "hittable.h"
+#include "material.h"
 #include "ray.h"
 #include "vec3.h"
 #include <iostream>
 #include <optional>
-namespace whitted {
-class triangle {
-public:
-	vec3 p1, p2, p3, n;
 
-	triangle(vec3 p1, vec3 p2, vec3 p3, vec3 n) : p1(p1), p2(p2), p3(p3), n(n) {
+namespace kajiya {
+struct BarycentricCoords {
+	//    p1 p2 p3
+	float u, v, w;
+
+	BarycentricCoords(float u, float v, float w) : u(u), v(v), w(w) {
+	}
+};
+
+class Triangle : public Hittable {
+public:
+	// NOTE(stekap): Maybe pack vertex attributes.
+	Vec3 p1, p2, p3;
+	Vec3 n1, n2, n3; // Not used until barycentric interpolation is introduced.
+
+	Material m;
+
+	Triangle() {
+		p1 = Vec3();
+		p2 = Vec3();
+		p3 = Vec3();
+		n1 = Vec3();
+		n2 = Vec3();
+		n3 = Vec3();
+		m  = Material::get_white();
 	}
 
-	std::optional<vec3> intersect(ray &r) const {
-		// G = p1
-		// n = n
-		// A = r.origin
-		// B = r.direction
-		float ray_parallel_with_plane_indicator = vec3::dot(r.direction, n);
+	Triangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n1, Vec3 n2, Vec3 n3, Material m)
+		: p1(p1), p2(p2), p3(p3), n1(n1), n2(n2), n3(n3), m(m) {
+	}
+
+	std::optional<IntersectionData> intersect(Ray &r) const {
+		Vec3 plane_normal = Vec3::cross(p2 - p1, p3 - p1).unit();
+
+		float ray_parallel_with_plane_indicator =
+			Vec3::dot(r.direction, plane_normal);
 
 		// Ray is parallel
 		if (ray_parallel_with_plane_indicator < 0.0005 &&
@@ -26,43 +52,84 @@ public:
 			return std::nullopt;
 		}
 
-		float t =
-			vec3::dot((p1 - r.origin), n) / ray_parallel_with_plane_indicator;
+		float t = Vec3::dot((p1 - r.origin), plane_normal) /
+				  ray_parallel_with_plane_indicator;
 
 		if (t > 0) {
-			vec3 intersection_point = r.value(t);
+			Vec3 intersection_point = r.value(t);
 
-			vec3 c1 = vec3::cross(intersection_point - p1, p2 - p1);
-			vec3 c2 = vec3::cross(intersection_point - p2, p3 - p2);
-			vec3 c3 = vec3::cross(intersection_point - p3, p1 - p3);
+			// Vec3 c1 = Vec3::cross(intersection_point - p1, p2 - p1);
+			// Vec3 c2 = Vec3::cross(intersection_point - p2, p3 - p2);
+			// Vec3 c3 = Vec3::cross(intersection_point - p3, p1 - p3);
+			//
+			// float d1 = Vec3::dot(c1, plane_normal);
+			// float d2 = Vec3::dot(c2, plane_normal);
+			// float d3 = Vec3::dot(c3, plane_normal);
+			//
+			//// Equality for when the point is on the edge of the triangle.
+			// if ((d1 <= 0 && d2 <= 0 && d3 <= 0) ||
+			//	(d1 >= 0 && d2 >= 0 && d3 >= 0))
+			//	return IntersectionData(intersection_point, -1);
+			// else
+			//	return std::nullopt;
 
-			float d1 = vec3::dot(c1, n);
-			float d2 = vec3::dot(c2, n);
-			float d3 = vec3::dot(c3, n);
+			BarycentricCoords bc = barycentric_coords_for(intersection_point);
 
-			if ((d1 < 0 && d2 < 0 && d3 < 0) || (d1 > 0 && d2 > 0 && d3 > 0))
-				return intersection_point;
-			else
-				return std::nullopt;
+			// TODO(stekap): Simplify condition.
+			// TODO(stekap): Use only two bary coords.
+
+			float bias = 0.00001;
+			if (bc.v >= 0 && bc.v <= 1 && bc.w >= 0 && bc.w <= 1 && bc.u >= 0 &&
+				bc.u <= 1 && bc.u + bc.v + bc.w <= 1 + bias &&
+				bc.u + bc.v + bc.w >= 0 - bias) {
+				// std::cout << "(" << bc.u << ", " << bc.v << ", " << bc.w <<
+				// ")" << std::endl;
+				return IntersectionData(intersection_point, -1);
+			}
 		}
 
 		return std::nullopt;
 	}
-};
 
-class rectangle : public hittable {
-public:
-	int num_squares_x, num_squares_y;
-	vec3 p1, p2, p3, p4, n;
-	triangle t1, t2;
-	material m;
-
-	rectangle(int x, int y, vec3 p1, vec3 p2, vec3 p3, vec3 p4, vec3 n)
-		: num_squares_x(x), num_squares_y(y), p1(p1), p2(p2), p3(p3), p4(p4),
-		  n(n), t1(triangle(p1, p2, p3, n)), t2(triangle(p2, p3, p4, n)) {
+	Vec3 normal(IntersectionData &intersection_data) const {
+		BarycentricCoords bc = barycentric_coords_for(intersection_data.point);
+		return n1 * bc.u + n2 * bc.v + n3 * bc.w;
 	}
 
-	std::optional<vec3> intersect(ray &r) const {
+	Material material(IntersectionData &intersection_data) const {
+		return m;
+	}
+
+	// NOTE(stekap): Check with mesh that has different triangle vertex normals.
+	BarycentricCoords barycentric_coords_for(Vec3 intersection_point) const {
+		Vec3 c1 = Vec3::cross(intersection_point - p1, p2 - p1);
+		Vec3 c2 = Vec3::cross(intersection_point - p2, p3 - p2);
+		Vec3 c3 = Vec3::cross(intersection_point - p3, p1 - p3);
+
+		float triangle_area = Vec3::cross(p2 - p1, p3 - p1).norm();
+
+		return BarycentricCoords(c2.norm() / triangle_area,
+								 c3.norm() / triangle_area,
+								 c1.norm() / triangle_area);
+	}
+};
+
+class Rectangle : public Hittable {
+public:
+	Vec3 p1, p2, p3, p4, n;
+	Triangle t1, t2;
+	Material m;
+
+	Rectangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 p4, Material m)
+		: p1(p1), p2(p2), p3(p3), p4(p4), m(m),
+		  n(Vec3::cross(p2 - p1, p4 - p1).unit()),
+		  t1(Triangle(p1, p2, p3, n, n, n, m)),
+		  // p3, p4, p1 gives black diagonal on left wall (tested on depth 2,
+		  // ray 50)
+		  t2(Triangle(p1, p3, p4, n, n, n, m)) {
+	}
+
+	std::optional<IntersectionData> intersect(Ray &r) const {
 		auto t1_result = t1.intersect(r);
 
 		if (!t1_result.has_value()) {
@@ -72,32 +139,12 @@ public:
 		return t1_result;
 	}
 
-	material mat() const {
-		return m;
-	}
-
-	vec3 normal(vec3 &point) const {
+	Vec3 normal(IntersectionData &intersection_data) const {
 		return n;
 	}
 
-	color get_color(vec3 &point) const {
-		vec3 x_axis	 = (p2 - p1);
-		vec3 y_axis	 = (p3 - p1);
-		float width	 = x_axis.norm();
-		float height = y_axis.norm();
-		float x		 = vec3::dot(point - p1, x_axis.unit());
-		float y		 = vec3::dot(point - p1, y_axis.unit());
-
-		float one_square_width	= width / num_squares_x;
-		float one_square_height = height / num_squares_y;
-
-		if ((int)(std::floor(x / one_square_width) +
-				  std::floor(y / one_square_height)) %
-				2 ==
-			0)
-			return color(0.8, 0.227, 0, 0);
-		else
-			return color(0.925, 0.898, 0.196, 0);
+	Material material(IntersectionData &intersection_data) const {
+		return m;
 	}
 };
-} // namespace whitted
+} // namespace kajiya

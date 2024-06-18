@@ -2,39 +2,39 @@
 
 #include <cmath>
 
-namespace whitted {
-class color {
+namespace kajiya {
+class Color {
 public:
 	float r, g, b, a;
 
-	color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {
+	Color(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {
 	}
 
-	color operator*(float scalar) const {
-		return color(r * scalar, g * scalar, b * scalar, a * scalar);
+	Color operator*(float scalar) const {
+		return Color(r * scalar, g * scalar, b * scalar, a * scalar);
 	}
 
-	color operator/(float scalar) const {
-		return color(r / scalar, g / scalar, b / scalar, a / scalar);
+	Color operator/(float scalar) const {
+		return Color(r / scalar, g / scalar, b / scalar, a / scalar);
 	}
 
-	color operator*(const color &other) const {
-		return color(r * other.r, g * other.g, b * other.b, a * other.a);
+	Color operator*(const Color &other) const {
+		return Color(r * other.r, g * other.g, b * other.b, a * other.a);
 	}
 
-	color operator/(color &other) const {
-		return color(r / other.r, g / other.g, b / other.b, a / other.a);
+	Color operator/(Color &other) const {
+		return Color(r / other.r, g / other.g, b / other.b, a / other.a);
 	}
 
-	color operator+(const color &other) {
-		return color(r + other.r, g + other.g, b + other.b, a + other.a);
+	Color operator+(const Color &other) {
+		return Color(r + other.r, g + other.g, b + other.b, a + other.a);
 	}
 
-	color operator+(float scalar) {
-		return color(r + scalar, g + scalar, b + scalar, a + scalar);
+	Color operator+(float scalar) {
+		return Color(r + scalar, g + scalar, b + scalar, a + scalar);
 	}
 
-	bool operator==(const color &other) const {
+	bool operator==(const Color &other) const {
 		return r == other.r && g == other.g && b == other.b && a == other.a;
 	}
 
@@ -42,20 +42,20 @@ public:
 		return std::sqrt(r * r + g * g + b * b + a * a);
 	}
 
-	color unit() const {
+	Color unit() const {
 		return *this / norm();
 	}
 
-	color clamp() const {
+	Color clamp() const {
 		float R = (r < 0) ? 0 : ((r > 1) ? 1 : r);
 		float G = (g < 0) ? 0 : ((g > 1) ? 1 : g);
 		float B = (b < 0) ? 0 : ((b > 1) ? 1 : b);
 		float A = (a < 0) ? 0 : ((a > 1) ? 1 : a);
-		return color(R, G, B, A);
+		return Color(R, G, B, A);
 	}
 
-	static color from_hex(int c) {
-		return color(((c >> 24) & 0xFF) / 255.f, ((c >> 16) & 0xFF) / 255.f,
+	static Color from_hex(int c) {
+		return Color(((c >> 24) & 0xFF) / 255.f, ((c >> 16) & 0xFF) / 255.f,
 					 ((c >> 8) & 0xFF) / 255.f, (c & 0xFF) / 255.f);
 	}
 
@@ -67,7 +67,7 @@ public:
 	}
 };
 
-color operator*(float scalar, color &color) {
+Color operator*(float scalar, Color &color) {
 	return color * scalar;
 }
-} // namespace whitted
+} // namespace kajiya
